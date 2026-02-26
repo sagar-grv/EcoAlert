@@ -44,7 +44,13 @@ export function AppProvider({ children }) {
             if (snapshot.empty && !seeded.current) {
                 // First load — Firestore is empty — seed with mock posts
                 seeded.current = true;
-                await seedFirestore();
+                try {
+                    await seedFirestore();
+                } catch (err) {
+                    console.error('Failed to seed Firestore (likely permission denied):', err);
+                    setPosts(seedPosts); // Fallback to local mock data
+                    setLoading(false);
+                }
                 // The snapshot listener will fire again once seeding is done
                 return;
             }
@@ -56,6 +62,11 @@ export function AppProvider({ children }) {
                 timestamp: d.data().timestamp?.toDate?.()?.toISOString() ?? new Date().toISOString(),
             }));
             setPosts(loadedPosts);
+            setLoading(false);
+        }, (err) => {
+            console.error('Firestore listener error:', err);
+            // Fallback to local mock data when Firebase fails to connect or read
+            setPosts(seedPosts);
             setLoading(false);
         });
 
@@ -127,8 +138,15 @@ export function AppProvider({ children }) {
                 aiSource: analysis.source,
             };
 
-            await addDoc(collection(db, 'posts'), newPost);
-            // No need to call setPosts — the onSnapshot listener fires automatically
+            try {
+                const docRef = await addDoc(collection(db, 'posts'), newPost);
+                // No need to call setPosts — the onSnapshot listener fires automatically
+            } catch (err) {
+                console.error("Failed to upload to Firestore, saving locally:", err);
+                newPost.id = generateId();
+                newPost.timestamp = new Date().toISOString();
+                setPosts(prev => [newPost, ...prev]);
+            }
         } finally {
             setPosting(false);
         }

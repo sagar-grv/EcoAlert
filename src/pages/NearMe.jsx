@@ -43,7 +43,8 @@ export default function NearMe() {
     const [city, setCity] = useState('Mumbai, Maharashtra');
 
     // Use real posts from context if available
-    const { posts } = useApp?.() ?? { posts: [] };
+    const appContext = useApp();
+    const posts = appContext?.posts ?? [];
 
     // Filter sample incidents by radius
     const incidents = SAMPLE_INCIDENTS.filter((i) => i.dist <= radius);

@@ -12,6 +12,8 @@ import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 
+import LandingPage from './pages/LandingPage';
+
 function PrivateLayout() {
     const { user, loading } = useAuth();
     const [showCreate, setShowCreate] = useState(false);
@@ -25,7 +27,12 @@ function PrivateLayout() {
         );
     }
 
-    if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+    if (!user) {
+        if (location.pathname === '/') {
+            return <LandingPage />;
+        }
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
 
     return (
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col">

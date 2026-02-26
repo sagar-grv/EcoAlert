@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Globe, ChevronDown } from 'lucide-react';
 import { useLang } from '../context/LangContext';
 
 export default function LanguagePicker() {
@@ -20,9 +19,9 @@ export default function LanguagePicker() {
     return (
         <div className="lang-picker" ref={ref}>
             <button className="lang-picker-btn" onClick={() => setOpen(o => !o)}>
-                <Globe size={15} />
+                <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>language</span>
                 <span className="lang-picker-name">{current.native}</span>
-                <ChevronDown size={13} style={{ opacity: 0.6, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }} />
+                <span className="material-symbols-outlined" style={{ fontSize: '13px', opacity: 0.6, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }}>expand_more</span>
             </button>
 
             {open && (

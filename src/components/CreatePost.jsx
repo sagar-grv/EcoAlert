@@ -96,107 +96,89 @@ export default function CreatePost({ onClose }) {
         <>
             {/* Backdrop */}
             <div
-                className="modal-backdrop"
+                className="fixed inset-0 bg-background-dark/80 backdrop-blur-sm z-[100] transition-opacity"
                 onClick={onClose}
-                style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 200, animation: 'fadeIn 0.15s ease' }}
             />
 
-            {/* Modal */}
+            {/* Bottom Sheet */}
             <div
-                className="create-post-modal glass-card anim-slide-up"
-                style={{
-                    position: 'fixed', left: '50%', top: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 201, width: 'min(96vw, 520px)',
-                    maxHeight: '90vh', overflowY: 'auto',
-                    padding: '1.5rem',
-                }}
+                className="fixed inset-x-0 bottom-0 z-[101] glass-panel rounded-t-3xl border-t border-white/20 dark:border-white/10 shadow-2xl transform transition-transform duration-300 ease-out flex flex-col max-h-[90vh]"
+                style={{ width: '100%', maxWidth: '448px', margin: '0 auto' }}
             >
+                {/* Handle */}
+                <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+                    <div className="w-12 h-1.5 bg-white/20 rounded-full" />
+                </div>
+
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-                        🌿 {t('postReport')}
+                <div className="px-6 py-2 flex justify-between items-center flex-shrink-0 border-b border-black/5 dark:border-white/5">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">eco</span>
+                        New Report
                     </h2>
                     <button
                         onClick={onClose}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.25rem' }}
-                        aria-label="Close"
+                        className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                     >
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
+                        <span className="material-symbols-outlined text-[20px]">close</span>
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {/* Caption */}
-                    <div>
-                        <label className="form-label">{t('caption')}</label>
-                        <textarea
-                            value={caption}
-                            onChange={(e) => { setCaption(e.target.value); setCharErr(''); }}
-                            placeholder={t('captionPlaceholder') || 'Describe the environmental incident…'}
-                            rows={4}
-                            className="form-textarea"
-                            style={{ resize: 'vertical', minHeight: '90px' }}
-                            disabled={posting}
-                        />
-                        {charErr && <div style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '0.25rem' }}>{charErr}</div>}
-                        <div style={{ textAlign: 'right', fontSize: '0.75rem', color: caption.length < 10 ? 'var(--danger)' : 'var(--text-muted)' }}>
-                            {caption.length} / 500
+                <div className="overflow-y-auto px-6 py-4 space-y-6 no-scrollbar">
+                    {/* Category Selection */}
+                    <div className="space-y-3">
+                        <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px] text-primary">category</span>
+                            Incident Type
+                        </label>
+                        <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar -mx-6 px-6">
+                            {CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    onClick={() => setCategory(cat)}
+                                    className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-all ${category === cat
+                                        ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105'
+                                        : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'
+                                        }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Category */}
-                    <div>
-                        <label className="form-label">{t('category')}</label>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="form-select"
-                            disabled={posting}
-                        >
-                            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                    </div>
-
-                    {/* City search */}
-                    <div style={{ position: 'relative' }}>
-                        <label className="form-label">
-                            <span className="material-symbols-outlined" style={{ fontSize: '13px', verticalAlign: 'middle', marginRight: '0.3rem' }}>location_on</span>
-                            Location (City)
+                    {/* Location Input */}
+                    <div className="space-y-3 relative">
+                        <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
+                            Location
                         </label>
-                        <div style={{ position: 'relative' }}>
+                        <div className="relative">
                             <input
                                 type="text"
+                                placeholder="Search location..."
                                 value={cityQuery}
                                 onChange={onCityInput}
-                                placeholder="Search for a city in India…"
-                                className="form-input"
-                                autoComplete="off"
                                 disabled={posting}
+                                className="w-full bg-black/5 dark:bg-black/20 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-10 pr-10 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-medium"
                             />
-                            {fetching && (
-                                <span className="material-symbols-outlined" style={{ fontSize: '14px', position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', animation: 'spin 1s linear infinite', color: 'var(--text-muted)' }}>autorenew</span>
+                            <span className="material-symbols-outlined absolute left-3 top-3.5 text-slate-500 text-[20px]">search</span>
+                            {fetching ? (
+                                <span className="material-symbols-outlined absolute right-3 top-3.5 text-slate-500 text-[20px] animate-spin">autorenew</span>
+                            ) : (
+                                <button className="absolute right-3 top-3.5 text-primary hover:text-primary/80 transition-colors">
+                                    <span className="material-symbols-outlined text-[20px]">my_location</span>
+                                </button>
                             )}
                         </div>
                         {suggestions.length > 0 && (
-                            <ul style={{
-                                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 300,
-                                background: 'var(--card-bg)', border: '1px solid var(--glass-border)',
-                                borderRadius: '0.6rem', marginTop: '0.25rem', listStyle: 'none', padding: '0.25rem 0',
-                                boxShadow: '0 8px 24px rgba(0,0,0,0.35)', maxHeight: '180px', overflowY: 'auto',
-                            }}>
+                            <ul className="absolute top-full left-0 right-0 mt-2 bg-surface-dark border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 max-h-48 overflow-y-auto">
                                 {suggestions.map((s, i) => (
                                     <li
                                         key={i}
                                         onClick={() => selectCity(s)}
-                                        style={{
-                                            padding: '0.55rem 0.85rem', cursor: 'pointer',
-                                            fontSize: '0.83rem', color: 'var(--text-secondary)',
-                                            borderBottom: i < suggestions.length - 1 ? '1px solid var(--glass-border)' : 'none',
-                                            transition: 'background 0.15s',
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(78,205,136,0.08)'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        className="px-4 py-3 border-b border-white/5 hover:bg-white/5 cursor-pointer text-sm text-slate-300 transition-colors"
                                     >
                                         {s.label}
                                     </li>
@@ -205,72 +187,107 @@ export default function CreatePost({ onClose }) {
                         )}
                     </div>
 
-                    {/* Image upload */}
-                    <div>
-                        <label className="form-label">Photo (optional)</label>
+                    {/* Photo Upload */}
+                    <div className="space-y-3">
+                        <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px] text-primary">photo_camera</span>
+                            Evidence <span className="text-slate-500 font-normal ml-1 text-xs">(Required)</span>
+                        </label>
                         {imageSrc ? (
-                            <div style={{ position: 'relative' }}>
-                                <img
-                                    src={imageSrc}
-                                    alt="preview"
-                                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '0.6rem', border: '1px solid var(--glass-border)' }}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setImageSrc(null)}
-                                    style={{
-                                        position: 'absolute', top: '0.5rem', right: '0.5rem',
-                                        background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%',
-                                        width: '28px', height: '28px', cursor: 'pointer', color: '#fff',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
-                                </button>
+                            <div className="relative rounded-xl overflow-hidden border border-white/10 group">
+                                <img src={imageSrc} alt="Preview" className="w-full h-48 object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => fileRef.current?.click()}
+                                        className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium mr-2 transition-colors"
+                                    >
+                                        Change
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setImageSrc(null)}
+                                        className="bg-red-500/80 hover:bg-red-500 backdrop-blur-sm text-white w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <button
                                 type="button"
                                 onClick={() => fileRef.current?.click()}
                                 disabled={posting}
-                                style={{
-                                    width: '100%', border: '2px dashed var(--glass-border)',
-                                    borderRadius: '0.6rem', padding: '1.25rem',
-                                    background: 'transparent', cursor: 'pointer',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                                    color: 'var(--text-muted)', fontSize: '0.85rem',
-                                    transition: 'border-color 0.2s',
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--green)'}
-                                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--glass-border)'}
+                                className="w-full h-32 rounded-xl border-2 border-dashed border-black/10 dark:border-white/10 hover:border-primary/50 bg-black/5 dark:bg-black/20 flex flex-col items-center justify-center gap-2 text-slate-400 hover:text-primary transition-all group"
                             >
-                                <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_photo_alternate</span>
-                                Add photo evidence
+                                <div className="w-10 h-10 rounded-full bg-white/5 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                    <span className="material-symbols-outlined text-[24px]">add_photo_alternate</span>
+                                </div>
+                                <span className="text-sm font-medium">Capture or Upload Photo</span>
                             </button>
                         )}
-                        <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImage} />
+                        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImage} />
                     </div>
 
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        className="btn-primary"
-                        disabled={posting || caption.trim().length < 10}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.95rem', padding: '0.75rem' }}
-                    >
-                        {posting ? (
-                            <><span className="material-symbols-outlined animate-spin" style={{ fontSize: '16px' }}>autorenew</span> Analyzing with AI…</>
-                        ) : (
-                            <><span className="material-symbols-outlined" style={{ fontSize: '15px' }}>send</span> Submit Alert</>
-                        )}
-                    </button>
+                    {/* Description */}
+                    <div className="space-y-3">
+                        <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px] text-primary">description</span>
+                            Description
+                        </label>
+                        <textarea
+                            value={caption}
+                            onChange={(e) => { setCaption(e.target.value); setCharErr(''); }}
+                            disabled={posting}
+                            placeholder="Describe the environmental issue in detail..."
+                            className="w-full bg-black/5 dark:bg-black/20 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm min-h-[100px] resize-y"
+                        />
+                        <div className="flex justify-between items-center mt-1">
+                            {charErr ? (
+                                <span className="text-xs text-red-400 font-medium">{charErr}</span>
+                            ) : (
+                                <span className="text-xs text-slate-500">Provide specific details to help verification</span>
+                            )}
+                            <span className={`text-xs ${caption.length < 10 ? 'text-red-400 font-medium' : 'text-slate-500'}`}>{caption.length}/500</span>
+                        </div>
+                    </div>
 
-                    {posting && (
-                        <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
-                            Gemini AI is verifying this report…
-                        </p>
+                    {/* AI Analysis Preview (Visible when fields are filled) */}
+                    {caption.length >= 10 && imageSrc && !posting && (
+                        <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex gap-3 anim-slide-up">
+                            <div className="mt-1">
+                                <img src="https://www.gstatic.com/lamda/images/sparkle_resting_v2_darkmode_2bdb7df2724e450073ede.gif" alt="Gemini" className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-[#21c45d] mb-1 tracking-wide">Gemini Analysis Ready</h4>
+                                <p className="text-xs text-[#9fb7a8] leading-relaxed">
+                                    Your report will be analyzed by AI to determine credibility, risk level, and environmental impact before publishing.
+                                </p>
+                            </div>
+                        </div>
                     )}
-                </form>
+
+                    {/* Submit Button */}
+                    <div className="pt-2 pb-6 border-t border-white/5">
+                        <button
+                            onClick={handleSubmit}
+                            disabled={posting || caption.trim().length < 10}
+                            className="w-full bg-primary hover:bg-[#1db053] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2"
+                        >
+                            {posting ? (
+                                <>
+                                    <span className="material-symbols-outlined animate-spin">autorenew</span>
+                                    AI Analyzing Report...
+                                </>
+                            ) : (
+                                <>
+                                    <span className="material-symbols-outlined">send</span>
+                                    Submit Alert
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
             </div>
         </>
     );

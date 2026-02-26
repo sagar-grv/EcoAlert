@@ -9,13 +9,17 @@ export default {
         extend: {
             colors: {
                 primary: '#21c45d',
-                'background-light': '#f6f8f7',
-                'background-dark': '#122017',
-                'card-dark': '#111811',
-                'surface-dark': '#1d2620',
+                'background-light': '#f8fafc',
+                'background-dark': '#0f172a',
+                'card-dark': '#111827',
+                'surface-dark': '#1e293b',
+                'risk-crit': '#ef4444',
+                'risk-high': '#f97316',
+                'risk-med': '#eab308',
+                'risk-low': '#1dc95c',
             },
             fontFamily: {
-                display: ['Outfit', 'sans-serif'],
+                display: ['Inter', 'sans-serif'],
                 body: ['Inter', 'sans-serif'],
                 sans: ['Inter', 'sans-serif'],
             },

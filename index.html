@@ -42,6 +42,14 @@
 
 <body>
   <div id="root"></div>
+  <script>
+    window.addEventListener('error', (event) => {
+      document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;top:0;left:0;right:0;background:red;color:white;padding:20px;z-index:9999;font-family:monospace;white-space:pre-wrap;box-shadow:0 10px 30px rgba(0,0,0,0.5);"><h2>App Crash (JS Error)</h2><p>' + event.message + '</p><p>Line: ' + event.lineno + ' Col: ' + event.colno + '</p><p>' + (event.error?.stack || '') + '</p></div>');
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;top:0;left:0;right:0;background:darkred;color:white;padding:20px;z-index:9999;font-family:monospace;white-space:pre-wrap;"><h2>App Crash (Unhandled Promise)</h2><p>' + event.reason + '</p></div>');
+    });
+  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

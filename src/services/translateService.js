@@ -13,7 +13,7 @@ function loadCache() {
 }
 
 function saveCache(cache) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch { }
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch { /* ignore JSON error */ }
 }
 
 /* ── Main translate function ── */

@@ -1,5 +1,4 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
 
 export default function FakeNewsIndicator({ fakeNews }) {
     if (!fakeNews) return null;
@@ -9,7 +8,7 @@ export default function FakeNewsIndicator({ fakeNews }) {
         <div className="credibility-bar-wrap">
             <div className="credibility-header">
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <ShieldCheck size={12} style={{ color }} />
+                    <span className="material-symbols-outlined" style={{ fontSize: '12px', color }}>gpp_good</span>
                     <span style={{ color, fontWeight: 600 }} className="credibility-label">{label}</span>
                 </span>
                 <span>Credibility: <strong style={{ color }}>{score}%</strong></span>

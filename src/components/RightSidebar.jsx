@@ -1,5 +1,4 @@
 import React from 'react';
-import { TrendingUp, AlertTriangle, Flame, MapPin, Leaf } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export default function RightSidebar() {
@@ -32,7 +31,7 @@ export default function RightSidebar() {
             {/* Trending Categories */}
             <div className="glass-card" style={{ padding: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                    <TrendingUp size={15} style={{ color: 'var(--green)' }} />
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px', color: 'var(--green)' }}>trending_up</span>
                     Trending Categories
                 </div>
                 {topCategories.length === 0 ? (
@@ -51,7 +50,7 @@ export default function RightSidebar() {
             {highRiskPosts.length > 0 && (
                 <div className="glass-card" style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                        <AlertTriangle size={15} style={{ color: '#f87171' }} />
+                        <span className="material-symbols-outlined" style={{ fontSize: '15px', color: '#f87171' }}>warning</span>
                         High Risk Alerts
                     </div>
                     {highRiskPosts.map((post) => (
@@ -70,7 +69,7 @@ export default function RightSidebar() {
             {/* Active Cities */}
             <div className="glass-card" style={{ padding: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                    <MapPin size={15} style={{ color: 'var(--green)' }} />
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px', color: 'var(--green)' }}>location_on</span>
                     Active Cities
                 </div>
                 {topCities.length === 0 ? (
@@ -87,7 +86,7 @@ export default function RightSidebar() {
 
             {/* EcoAlert info */}
             <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-                <Leaf size={22} style={{ color: 'var(--green)', marginBottom: '0.5rem' }} />
+                <span className="material-symbols-outlined" style={{ fontSize: '22px', color: 'var(--green)', marginBottom: '0.5rem' }}>eco</span>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.35rem' }}>EcoAlert India</div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>Real-time environmental monitoring powered by AI. Report. Verify. Protect.</div>
             </div>

@@ -13,38 +13,22 @@ export default function Navbar({ onCreatePost }) {
     }
 
     return (
-        <header className="sticky top-0 z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-gray-200 dark:border-white/5 px-4 py-3 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-                <div className="text-primary p-1.5 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-2xl">eco</span>
-                </div>
-                <h1 className="text-xl font-bold tracking-tight font-display text-slate-900 dark:text-white">EcoAlert</h1>
-            </Link>
+        <header className="sticky top-0 z-50 glass-nav px-4 py-4 border-b">
+            <div className="flex items-center justify-between max-w-md mx-auto">
+                <Link to="/" className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-2xl">eco</span>
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">EcoAlert <span className="text-primary/60 font-medium text-sm ml-1">India</span></h1>
+                </Link>
 
-            <div className="flex items-center gap-3">
-                {onCreatePost && (
-                    <button
-                        onClick={onCreatePost}
-                        className="hidden sm:flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
-                    >
-                        <span className="material-symbols-outlined text-[18px]">add</span>
-                        Report
-                    </button>
-                )}
-                <button className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
-                    <span className="material-symbols-outlined">notifications</span>
-                </button>
-
-                {/* Avatar dropdown */}
                 <div className="relative">
                     <button
                         onClick={() => setDropOpen(v => !v)}
-                        className="h-8 w-8 rounded-full bg-slate-200 dark:bg-surface-dark overflow-hidden border border-slate-200 dark:border-white/10 flex items-center justify-center text-sm font-bold text-primary"
+                        className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 hover:scale-105 transition-transform"
                     >
-                        {user?.name?.[0]?.toUpperCase() || 'U'}
+                        <span className="material-symbols-outlined text-primary">account_circle</span>
                     </button>
                     {dropOpen && (
-                        <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-surface-dark rounded-xl shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                        <div className="absolute right-0 mt-3 w-48 glass-panel rounded-2xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-top-4 duration-200">
                             <Link
                                 to="/profile"
                                 onClick={() => setDropOpen(false)}

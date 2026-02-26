@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ChevronDown, Sparkles } from 'lucide-react';
 
 export default function AISuggestionPanel({ suggestions = [] }) {
     const [open, setOpen] = useState(false);
@@ -13,9 +12,9 @@ export default function AISuggestionPanel({ suggestions = [] }) {
                 onClick={() => setOpen((o) => !o)}
             >
                 <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Sparkles size={13} /> AI Suggestions ({suggestions.length})
+                    <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>auto_awesome</span> AI Suggestions ({suggestions.length})
                 </span>
-                <ChevronDown size={14} />
+                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>expand_more</span>
             </button>
             {open && (
                 <ul className="suggestions-list" style={{ listStyle: 'none' }}>
