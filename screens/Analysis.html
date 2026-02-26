@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoAlert AI Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                        "surface-dark": "#1a2c23",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col overflow-x-hidden text-slate-900 dark:text-slate-100">
+<!-- Header -->
+<div class="sticky top-0 z-10 flex items-center justify-between p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">AI Analysis</h1>
+</div>
+<button class="text-primary font-semibold text-sm">Help</button>
+</div>
+<!-- Main Content -->
+<main class="flex-1 p-4 flex flex-col gap-6">
+<!-- Stats Row -->
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col justify-between p-5 bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-primary text-3xl">psychology</span>
+<span class="flex h-3 w-3 rounded-full bg-primary relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+</span>
+</div>
+<div class="mt-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">AI Features Active</p>
+<p class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">4/5</p>
+</div>
+</div>
+<div class="flex flex-col justify-between p-5 bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-orange-400 text-3xl">warning</span>
+</div>
+<div class="mt-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Limitations</p>
+<p class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">v0.9</p>
+</div>
+</div>
+</div>
+<!-- Current AI Stack -->
+<div>
+<h3 class="text-lg font-bold mb-4 px-1">Current AI Stack</h3>
+<div class="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<!-- Row 1 -->
+<div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">fact_check</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Fake News Detector</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Verifying sources</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-primary font-bold">98.5%</p>
+<p class="text-[10px] text-slate-400 uppercase tracking-wider">Accuracy</p>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">shield</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Risk Classifier</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Real-time assessment</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-primary font-bold">94.2%</p>
+<p class="text-[10px] text-slate-400 uppercase tracking-wider">Accuracy</p>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">image_search</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Image Verification</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Deepfake detection</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-primary font-bold">99.1%</p>
+<p class="text-[10px] text-slate-400 uppercase tracking-wider">Accuracy</p>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">verified</span>
+</div>
+<div>
+<p class="font-semibold text-sm">Source Credibility</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Database cross-check</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-emerald-400 font-bold">High</p>
+<p class="text-[10px] text-slate-400 uppercase tracking-wider">Confidence</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Future Features Grid -->
+<div>
+<h3 class="text-lg font-bold mb-4 px-1">Future Features</h3>
+<div class="grid grid-cols-2 gap-4">
+<!-- Card 1 -->
+<div class="p-4 bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 relative group overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">satellite_alt</span>
+</div>
+<h4 class="font-semibold text-sm mb-1">Satellite Scan</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Automated deforestation monitoring via satellite feeds.</p>
+</div>
+<!-- Card 2 -->
+<div class="p-4 bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 relative group overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">forest</span>
+</div>
+<h4 class="font-semibold text-sm mb-1">Bio-Diversity</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Species identification from audio recordings.</p>
+</div>
+<!-- Card 3 -->
+<div class="p-4 bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 relative group overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">water_drop</span>
+</div>
+<h4 class="font-semibold text-sm mb-1">Water Quality</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Pollution analysis using visual water samples.</p>
+</div>
+<!-- Card 4 - Coming Soon -->
+<div class="p-4 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-slate-400 mb-2">add_circle</span>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">More Coming Soon</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="sticky bottom-0 w-full bg-white dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 pb-safe pt-2 px-2 z-20">
+<div class="flex justify-around items-end pb-3">
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[24px]">home</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[24px]">error</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Report</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="bg-primary/10 text-primary w-12 h-8 rounded-full flex items-center justify-center mb-0.5">
+<span class="material-symbols-outlined text-[24px] font-variation-settings-'FILL'1">analytics</span>
+</div>
+<span class="text-[10px] font-bold text-primary">Analysis</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[24px]">person</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Safe area spacing for iOS home indicator -->
+<div class="h-4 bg-white dark:bg-surface-dark w-full"></div>
+</body></html>

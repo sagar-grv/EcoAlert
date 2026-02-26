@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Near Me Reports - EcoAlert</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                        "surface-dark": "#1a2c22", 
+                        "blue-accent": "#3b82f6",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+<!-- Header -->
+<div class="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white" style="font-size: 24px;">arrow_back</span>
+</button>
+<h2 class="text-lg font-bold">Near Me</h2>
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white" style="font-size: 24px;">map</span>
+</button>
+</div>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col w-full max-w-md mx-auto pb-24">
+<!-- Location Detection -->
+<div class="px-4 pt-6 pb-2 flex justify-center">
+<button class="flex items-center gap-2 bg-blue-accent/20 text-blue-500 dark:text-blue-400 border border-blue-accent/30 hover:bg-blue-accent/30 transition-all px-6 py-3 rounded-full font-semibold text-sm">
+<span class="material-symbols-outlined" style="font-size: 20px;">my_location</span>
+<span>Detect My Location</span>
+</button>
+</div>
+<h1 class="text-center text-2xl font-bold mt-4 mb-1">Mumbai, Maharashtra</h1>
+<p class="text-center text-sm text-slate-500 dark:text-slate-400 mb-6">42 active reports found</p>
+<!-- Radius Slider -->
+<div class="mx-4 mb-8 bg-surface-dark rounded-2xl p-5 border border-slate-800">
+<div class="flex items-center justify-between mb-3">
+<span class="text-sm font-medium text-slate-400">Search Radius</span>
+<span class="text-primary font-bold">25 km</span>
+</div>
+<div class="relative h-6 flex items-center">
+<div class="absolute w-full h-1.5 bg-slate-700 rounded-full"></div>
+<div class="absolute h-1.5 bg-primary rounded-full w-[25%]"></div>
+<div class="absolute left-[25%] -ml-3 size-6 bg-white rounded-full shadow-lg border-2 border-primary cursor-pointer flex items-center justify-center">
+<div class="size-1.5 bg-primary rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-between mt-2 text-xs text-slate-500">
+<span>10 km</span>
+<span>100 km</span>
+</div>
+</div>
+<!-- Reports List -->
+<div class="px-4 space-y-4">
+<h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider ml-1">Nearby Incidents</h3>
+<!-- Card 1 -->
+<div class="group relative flex flex-col gap-3 rounded-2xl bg-surface-dark border border-slate-800 p-3 hover:border-slate-700 transition-colors">
+<div class="relative h-48 w-full overflow-hidden rounded-xl">
+<img alt="Garbage pile on street corner" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Garbage pile on street corner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQnNiZtWd-l2y6JIKpxOsaRSd1PysSsOW-6RJmmFiwHnc1qJJFrJcxVtDDtfcw9aGhD8rCRJxcdMV7KRMMzZfaOac5zo0oWxL7GhE5Z2XXYUja4mG5gypbBrxOYc6StLGTlMqiWJ7bz0TH5eDP9DJtOE0FoPNgU8h_rTFSVbbR5m1aptEUFlaFUqiq84TutfO5HMXEzzPTnoD36QivRNskYWKg51JSbEeJKet_GvbEeLe4l9orPnHvy_BROpvW5kAYAc_LEKYRrcyJ"/>
+<div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1 border border-white/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 14px;">near_me</span>
+                        3.2 km
+                    </div>
+<div class="absolute bottom-3 left-3">
+<span class="bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Critical</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<div class="flex justify-between items-start">
+<h4 class="text-lg font-bold text-slate-100 line-clamp-1">Illegal Dumping in Bandra</h4>
+<span class="text-xs text-slate-400 whitespace-nowrap mt-1">2h ago</span>
+</div>
+<p class="text-sm text-slate-400 line-clamp-2">Found a large pile of construction debris dumped near the mangroves. Needs immediate attention.</p>
+<div class="mt-2 flex items-center gap-2">
+<div class="flex -space-x-2">
+<img alt="User avatar" class="inline-block size-6 rounded-full ring-2 ring-surface-dark object-cover" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQWc85ykT3k5dI0D648TYOj4GIr5RQD9x83zOf5nyE3dYW8P8KO_M-fyHlc3gDG8dPxADTgDzNXp3O4bA28spVKRFIyW2Mj2WGtUMy2SAVVnR3Sd-QXm-VKiC4BdUgxviVYoGZXo6nNbE2Y0i8YJ1qeicMNivXHSLfk5G9TqUUPa0I23xvid8UUvrHpT1gN0dGYlkxuqBjBpV3Jc9tuqIbTf8tI0Biz6cX7SHwSUiC-5UdZ9CnNUe3tGcOr1M8S_akR4aCfWYV7ekp"/>
+<div class="flex size-6 items-center justify-center rounded-full ring-2 ring-surface-dark bg-slate-700 text-[10px] font-medium text-white">+5</div>
+</div>
+<span class="text-xs text-primary font-medium">Verified by AI</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative flex flex-col gap-3 rounded-2xl bg-surface-dark border border-slate-800 p-3 hover:border-slate-700 transition-colors">
+<div class="relative h-48 w-full overflow-hidden rounded-xl">
+<img alt="Polluted river water" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Polluted river water" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7f2vWizhYshiIBYq3lceYoWLu4LuYduMwgnEV9q8M4hP19zRz1EsN26LyjXy0X-V-5RiUdA0LloHF3jwo2_ryzmACAKaliwmVBBdcseclhAT_hYDWqOkqAFk3fDCAfXXJ4J_FhZZ6KDbfcRMJR0T_pOlmUN7QFc5P138PyHqVbBNFAXbw6Mxkb_LkRbo9LsRORW9KtbdPXwWW18kxHbMfClal3PP0EDAuRfLZyPF8SELmhYT265VZ0ymNgi2acAOfWQdp6NY2rEfI"/>
+<div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1 border border-white/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 14px;">near_me</span>
+                        5.8 km
+                    </div>
+<div class="absolute bottom-3 left-3">
+<span class="bg-orange-500/90 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Moderate</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<div class="flex justify-between items-start">
+<h4 class="text-lg font-bold text-slate-100 line-clamp-1">Chemical Runoff at Creek</h4>
+<span class="text-xs text-slate-400 whitespace-nowrap mt-1">5h ago</span>
+</div>
+<p class="text-sm text-slate-400 line-clamp-2">Water has turned a strange color and smells pungent. Possible industrial leak upstream.</p>
+<div class="mt-2 flex items-center gap-2">
+<div class="flex -space-x-2">
+<img alt="User avatar" class="inline-block size-6 rounded-full ring-2 ring-surface-dark object-cover" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVS5MjQlgSz4KjA8IfIPjGj5xpKrBGII4hh4TGx94XXwH6JUbobenPB-1r78uRX7CdKZlpvsJ6QYGPy8zo5Q4xH4ces-bXuNcfPqiSWgWnXP1jcHkXUgd0K3veriaPsuUxKRzYz2g94XrjDN2tcybLkCYiR6fO56tsHd0TmEpT7M5Uppey1WkQ6k2zZ400AuQICWPo5FAXgip9SUoYwqJQnrAFkIyyysuF8chYFW6gGm8wjrqoBIjtKwnlrmYr81YBQRdJ8IQeMFKW"/>
+<div class="flex size-6 items-center justify-center rounded-full ring-2 ring-surface-dark bg-slate-700 text-[10px] font-medium text-white">+12</div>
+</div>
+<span class="text-xs text-slate-500 font-medium">Pending Verification</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative flex flex-col gap-3 rounded-2xl bg-surface-dark border border-slate-800 p-3 hover:border-slate-700 transition-colors">
+<div class="relative h-48 w-full overflow-hidden rounded-xl">
+<img alt="Tree cutting debris" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Tree cutting debris" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1KKjkg3dO5oFNK8e46I_lDQ-fNtJPfl44YsoE5Y6ZRoI-EbLr0YOh91qyr3Z_PeMUIhYOBHvSIWpwVEi9RTLb24684a5jSbrPksXNHwNFBdBj7oN2jxUCtQFg55yWSO0IzMBWZcbD7vb35JjgYGgByZ6KbgkGkADhRRQq2Zd3hP3TUJieSfVg-rM-16rXQiAUEtslwowsHkSHFJe1NrcPVcldmJPQi2YrNHkP9c8CtK9li2A326h9SOSzLV2Tw0WVYTw8y_XesR2m"/>
+<div class="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1 border border-white/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 14px;">near_me</span>
+                        8.1 km
+                    </div>
+<div class="absolute bottom-3 left-3">
+<span class="bg-yellow-500/90 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Warning</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 px-1">
+<div class="flex justify-between items-start">
+<h4 class="text-lg font-bold text-slate-100 line-clamp-1">Unauthorized Tree Cutting</h4>
+<span class="text-xs text-slate-400 whitespace-nowrap mt-1">1d ago</span>
+</div>
+<p class="text-sm text-slate-400 line-clamp-2">Several old trees cut down near the park entrance without any visible permits.</p>
+<div class="mt-2 flex items-center gap-2">
+<div class="flex -space-x-2">
+<img alt="User avatar" class="inline-block size-6 rounded-full ring-2 ring-surface-dark object-cover" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwatoZj24Wuv7i7CylF9iucCXMbZDX-iBURalgQwSWHTIhhbazkKYIf9K4obXLo7sQTZ8AO1PvfEbxzqrAXXSp4V6nKAIjG6ybSwCioAyaPO_8PS4ZSX1eMQyiNF6SwozFTDN6eyJESSAxGH-3cJn_PLOvwS8ht744JfnvPwl5K0P7z0eFt0In1acfvTXsTBAFbAJvPCuS7_5ohoFEoP_awl2uDTK7OZnn3Ams3V1Z2lvPF3LMob0B62fgZEbsgnh4OKlgl8033F4I"/>
+</div>
+<span class="text-xs text-primary font-medium">Verified by AI</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-800 bg-surface-dark/95 backdrop-blur-lg pb-safe">
+<div class="flex justify-around items-center px-2 py-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px] font-variation-settings-FILL">near_me</span>
+<span class="text-[10px] font-medium">Near Me</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<div class="flex size-10 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30 transform -translate-y-4 border-4 border-surface-dark">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</div>
+<span class="text-[10px] font-medium transform -translate-y-2">Report</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">leaderboard</span>
+<span class="text-[10px] font-medium">Impact</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Safe Area Spacing for Bottom Nav -->
+<div class="h-[80px]"></div>
+</body></html>

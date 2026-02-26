@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Environmental Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display flex flex-col items-center justify-end min-h-screen text-slate-900 dark:text-slate-100 overflow-hidden">
+<!-- Blurred background overlay simulation -->
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-0"></div>
+<!-- Main Map Background simulation behind the sheet -->
+<div class="fixed inset-0 z-[-1] opacity-60">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="Dark map of India city streets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPsDg2GozO7O_Q7D5K9Zp27a9sxH_pbRnPJSHqpUJqDk1DXvpyhQaHsnfNqwC0-4Xd4DgYF3TGGG1lN0O8F74NiIaW84d35m3kawBsPsxseZLc7hXB2OZ3gAq0IVkaNIW02WX3s47OtLoYFAf-ghUQGiq4UqqiOU1ZklK2vpY2HzlHNNmqW5hXYJyC-F6AvYidh4SdTXsWuVnmIV1H1w__wDzJ2KmpI1U9-Vnq3h4xCy4k_Z7oMeMeG_PnjVwVqjbkg9TQeZoJds42"/>
+</div>
+<!-- Bottom Sheet Container -->
+<div class="relative w-full max-w-md bg-white dark:bg-[#1a2e23] rounded-t-xl shadow-2xl z-10 flex flex-col max-h-[90vh] overflow-hidden">
+<!-- Drag Handle -->
+<div class="flex items-center justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing">
+<div class="h-1.5 w-12 rounded-full bg-slate-200 dark:bg-slate-600"></div>
+</div>
+<!-- Header -->
+<div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-700/50">
+<h2 class="text-lg font-bold tracking-tight">Report Environmental Issue</h2>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-6">
+<!-- Category Selector -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Category</label>
+<div class="flex flex-wrap gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30 text-sm font-medium hover:bg-primary/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">recycling</span>
+                        Waste
+                    </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-transparent text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[18px]">water_drop</span>
+                        Water
+                    </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-transparent text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[18px]">co2</span>
+                        Pollution
+                    </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-transparent text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[18px]">forest</span>
+                        Wildlife
+                    </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-transparent text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[18px]">park</span>
+                        Deforestation
+                    </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-transparent text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+                        Other
+                    </button>
+</div>
+</div>
+<!-- Description Input -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Description</label>
+<textarea class="w-full rounded-xl bg-slate-50 dark:bg-[#122017] border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-slate-100 p-4 min-h-[120px] resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="Describe the issue you observed. Be specific about the location and severity..."></textarea>
+</div>
+<!-- Location Search -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Location</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-primary">location_on</span>
+</div>
+<input class="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-50 dark:bg-[#122017] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Search location" type="text" value="Near Cubbon Park, Bengaluru"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<button class="text-xs text-primary font-medium hover:underline">Edit on map</button>
+</div>
+</div>
+</div>
+<!-- Evidence Upload -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Evidence</label>
+<div class="flex gap-3">
+<div class="relative h-20 w-20 shrink-0 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 group">
+<img class="h-full w-full object-cover" data-alt="Overflowing garbage bin on street" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj8aLt_BjdYlYVexcO3FUDOKBQL-wjyxMo9ly0kBSsmeWOB8ERCA0jW1Ou88SxeEwypRxwiiAby5YKVKmnP5vf8GAXQ8ZFx5FOlCqwWbuYV7jr2m9MGDbMyduZjaCb0YNBco4-1PDpIT6AQz0ehXI6cCBr2mxFaT_Czuke4vgCIycDfFtjQo2SsgNuu7tk4PWgB-FEX8yvgaeK5JgppMUfJUAglaVB4eAHCbZbKbxy6r8WWBWuUrwPok3ifUJq6s3Wj6D84RFuOXUv"/>
+<button class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 hover:bg-red-500 transition-colors">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<button class="flex flex-1 flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-primary dark:hover:border-primary bg-slate-50 dark:bg-[#122017] p-2 transition-all group h-20">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary mb-1">add_a_photo</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 group-hover:text-primary">Upload Photo/Video</span>
+</button>
+</div>
+</div>
+<!-- AI Analysis Card -->
+<div class="bg-gradient-to-br from-[#122017] to-[#1a2e23] border border-primary/20 rounded-xl p-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-outlined text-6xl text-primary">auto_awesome</span>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary">temp_preferences_custom</span>
+<h3 class="text-sm font-bold text-slate-100">Gemini Verification</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 mb-1">Risk Level</span>
+<span class="inline-flex w-fit items-center rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20">High</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 mb-1">Credibility Score</span>
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-16 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">85%</span>
+</div>
+</div>
+</div>
+<p class="mt-3 text-xs text-slate-400 italic leading-relaxed">
+                    "Analysis detects significant waste accumulation near a water source. Highly likely to impact local hygiene."
+                </p>
+</div>
+<!-- Extra padding for scrolling above button -->
+<div class="h-4"></div>
+</div>
+<!-- Footer / Action Button -->
+<div class="p-5 border-t border-slate-100 dark:border-slate-700/50 bg-white dark:bg-[#1a2e23]">
+<button class="w-full flex items-center justify-center gap-2 rounded-full bg-primary hover:bg-green-600 text-white font-bold py-3.5 px-6 shadow-lg shadow-primary/25 transition-all active:scale-[0.98]">
+<span>Post Report</span>
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</div>
+</body></html>

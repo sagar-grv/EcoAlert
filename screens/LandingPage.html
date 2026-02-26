@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoAlert Landing Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                        "glass-dark": "rgba(30, 41, 35, 0.6)",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                    },
+                    fontFamily: {
+                        "display": ["Outfit", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+        .bg-glass {
+            background: rgba(30, 41, 35, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 overflow-x-hidden transition-colors duration-300">
+<div class="relative flex min-h-screen w-full flex-col mx-auto max-w-[480px]">
+<!-- Header -->
+<header class="flex items-center justify-between p-5 sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[28px]">eco</span>
+<h2 class="text-white text-xl font-bold tracking-tight">EcoAlert</h2>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white">menu</span>
+</button>
+</header>
+<!-- Hero Section -->
+<div class="relative p-4 pt-6 pb-8">
+<div class="relative flex flex-col gap-6 items-center justify-center p-8 rounded-xl overflow-hidden min-h-[500px] text-center shadow-2xl shadow-primary/5 border border-white/5" style="background-image: linear-gradient(to bottom, rgba(18, 32, 23, 0.3), rgba(18, 32, 23, 0.95)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDz3UTN_pZN16ZPT7Oedij6OM1Xx05Yt_d0pcGswRw8NVuFABwG5wuQWykC1-EAzhMcGVL9SUkwJ-dXNJyMD5z0SnMPHi8-as1VMDotUeXGppovnanEVeMRAhlG8ySBkhEQRalH4n7b9M1Ujm3QoHTkIZkw9mc5zpZqVf-Qoc36jgDzYOa3FzmrEZbrT3Te6onJKOuIGKPl2zLTVdYWCK8iCgzPArxZEBLZkLBEpRxTLiSVEIdOuNrODFDlcTWAngWHjZtlhcBtamS8'); background-size: cover; background-position: center;">
+<!-- Data Alt for background image -->
+<div class="sr-only" data-alt="Dark moody forest with mist and light rays"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-90"></div>
+<!-- Content -->
+<div class="relative z-10 flex flex-col items-center gap-2 max-w-[320px]">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 mb-2 backdrop-blur-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs font-semibold text-primary uppercase tracking-wider">Live in India</span>
+</div>
+<h1 class="text-white text-5xl font-black leading-[1.1] tracking-tight">
+                        Report.<br/>
+<span class="text-primary">Verify.</span><br/>
+                        Act.
+                    </h1>
+<p class="text-slate-300 text-base mt-3 font-body leading-relaxed max-w-[280px]">
+                        Join India's largest community-driven environmental monitoring network.
+                    </p>
+</div>
+<div class="relative z-10 flex flex-col w-full gap-3 mt-4 max-w-[280px]">
+<button class="flex items-center justify-center w-full h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-background-dark font-bold text-base transition-all transform active:scale-95 shadow-[0_0_20px_rgba(33,196,93,0.3)]">
+                        Get Started
+                    </button>
+<button class="flex items-center justify-center w-full h-12 px-6 rounded-full bg-white/5 hover:bg-white/10 text-white font-semibold text-base backdrop-blur-sm border border-white/10 transition-all active:scale-95">
+<span class="mr-2 material-symbols-outlined text-[20px]">sensors</span>
+                        See Live Feed
+                    </button>
+</div>
+</div>
+</div>
+<!-- Stats Section -->
+<div class="flex flex-row gap-3 px-4 pb-8 overflow-x-auto no-scrollbar snap-x">
+<div class="flex-1 min-w-[120px] bg-glass p-5 rounded-xl flex flex-col gap-1 border border-white/5 shadow-lg snap-start">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-[20px]">folder_open</span>
+<p class="text-slate-400 text-xs font-medium uppercase tracking-wider">Reports</p>
+</div>
+<p class="text-white text-2xl font-bold font-display">12k+</p>
+</div>
+<div class="flex-1 min-w-[120px] bg-glass p-5 rounded-xl flex flex-col gap-1 border border-white/5 shadow-lg snap-start">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-[20px]">map</span>
+<p class="text-slate-400 text-xs font-medium uppercase tracking-wider">States</p>
+</div>
+<p class="text-white text-2xl font-bold font-display">28</p>
+</div>
+<div class="flex-1 min-w-[120px] bg-glass p-5 rounded-xl flex flex-col gap-1 border border-white/5 shadow-lg snap-start">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-[20px]">category</span>
+<p class="text-slate-400 text-xs font-medium uppercase tracking-wider">Types</p>
+</div>
+<p class="text-white text-2xl font-bold font-display">6</p>
+</div>
+</div>
+<!-- How It Works Section -->
+<div class="px-4 pb-10">
+<div class="flex items-center justify-between mb-6 px-2">
+<h2 class="text-white text-2xl font-bold">How It Works</h2>
+<span class="text-primary text-sm font-medium">View Guide</span>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Step 1 -->
+<div class="group relative flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-[#1a2c22] to-[#122017] border border-white/5 hover:border-primary/30 transition-colors duration-300">
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary border border-primary/20 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined">photo_camera</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="text-white text-lg font-bold">Report Incident</h3>
+<p class="text-slate-400 text-sm leading-relaxed">Snap a photo of pollution or waste. GPS location is auto-tagged instantly.</p>
+</div>
+<div class="absolute top-5 right-5 text-white/5 font-display text-4xl font-black -z-0 select-none">1</div>
+</div>
+<!-- Step 2 -->
+<div class="group relative flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-[#1a2c22] to-[#122017] border border-white/5 hover:border-primary/30 transition-colors duration-300">
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary border border-primary/20 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="text-white text-lg font-bold">AI Verification</h3>
+<p class="text-slate-400 text-sm leading-relaxed">Our advanced AI validates the report authenticity and categorizes severity.</p>
+</div>
+<div class="absolute top-5 right-5 text-white/5 font-display text-4xl font-black -z-0 select-none">2</div>
+</div>
+<!-- Step 3 -->
+<div class="group relative flex items-start gap-4 p-5 rounded-xl bg-gradient-to-br from-[#1a2c22] to-[#122017] border border-white/5 hover:border-primary/30 transition-colors duration-300">
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary border border-primary/20 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined">diversity_3</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="text-white text-lg font-bold">Community Action</h3>
+<p class="text-slate-400 text-sm leading-relaxed">Verified reports alert local authorities and nearby community volunteers.</p>
+</div>
+<div class="absolute top-5 right-5 text-white/5 font-display text-4xl font-black -z-0 select-none">3</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Mini Feed -->
+<div class="px-4 pb-20">
+<h2 class="text-white text-lg font-bold mb-4 px-2">Recent Verified Reports</h2>
+<div class="bg-glass rounded-xl p-4 border border-white/5 flex flex-col gap-4">
+<div class="flex items-center gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+<div class="w-12 h-12 rounded-lg bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDIkeU3HiS2W-OUvqZHYdrVpnvAhfXZW8r766fYvYhdePGveciVUfPIzlgwpx9a_q58KhOiip59-4x6EpDYiVLLEaVbHT4EhlgLqkFovv8WKcACZGYVgp5P7xIQX_0fexwSYgHZm4iJQlvjsfM2CZftLEvApNpgeys4Eq5Wlm-5K_YDhdBlam4IraZjqTm5bFvhE9SiHLeyjkKDDV81uurTlQcI4_pq5VAjk8c0iba3hDKAcdFYKvA7NlmlFqaK5TzKo7ZpzJYXv4O-');">
+<div class="sr-only" data-alt="Plastic waste near river bank"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="text-white text-sm font-semibold">Plastic Waste</h4>
+<span class="text-[10px] text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded">2m ago</span>
+</div>
+<p class="text-slate-400 text-xs">Bangalore, Karnataka</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+</div>
+<div class="flex items-center gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+<div class="w-12 h-12 rounded-lg bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmPK4pkLLMbuCJYAJJvRC9ZAm7gtU2j2WxMRFzxCdyag_uNSFd6yl7dMeFkt9j9T4gHyFhh6Ca6lU-61H2-weCMsNJpdOOsbZ3POkKs7ddFienXlWzjqhEaKn__DJtE7RV1s6u-fsAode1mna8tmsu7UNaJrMMn4okKfdAY1GPfdXxFFSYWNXeUEIA-IooVZorAxVTiHzIPY-mvo7KfKeqMqn_sGmOSchTg6jbFKoSTtdxyU1j_oxIqzUk91vSWyhCcArpVvMCEaXY');">
+<div class="sr-only" data-alt="Industrial smoke emission"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="text-white text-sm font-semibold">Air Quality Alert</h4>
+<span class="text-[10px] text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded">15m ago</span>
+</div>
+<p class="text-slate-400 text-xs">New Delhi, Delhi</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation (Mobile) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-dark/90 backdrop-blur-lg border-t border-white/5 p-2 px-6 flex justify-between items-center z-50 max-w-[480px] mx-auto">
+<button class="flex flex-col items-center gap-1 p-2 text-primary">
+<span class="material-symbols-outlined filled">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-medium">Map</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 -mt-8">
+<div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-background-dark shadow-[0_0_15px_rgba(33,196,93,0.4)] border-4 border-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-[10px] font-medium">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</nav>
+</div>
+</body></html>

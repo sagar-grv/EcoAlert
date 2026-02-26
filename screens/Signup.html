@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoAlert - Create Account</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#1dc95c",
+                "background-light": "#f6f8f7",
+                "background-dark": "#112117",
+              },
+              fontFamily: {
+                "display": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(29, 201, 92, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(29, 201, 92, 0.1);
+        }
+        .glow-input:focus {
+            box-shadow: 0 0 15px rgba(29, 201, 92, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 overflow-hidden">
+<!-- Decorative background elements -->
+<div class="fixed top-[-10%] right-[-10%] w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="fixed bottom-[-10%] left-[-10%] w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="w-full max-w-[390px] mx-auto relative z-10">
+<!-- Header Section -->
+<div class="mb-8 text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-xl mb-4">
+<span class="material-icons text-primary text-3xl">eco</span>
+</div>
+<h1 class="text-3xl font-bold tracking-tight mb-2">Join EcoAlert</h1>
+<p class="text-slate-500 dark:text-slate-400">Verified environmental reporting for India</p>
+</div>
+<!-- Signup Form Card -->
+<div class="glass-card rounded-lg p-6 shadow-2xl">
+<form action="#" class="space-y-5" method="POST">
+<!-- Full Name Field -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Full Name</label>
+<div class="relative">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">person</span>
+<input class="w-full bg-slate-900/40 border-slate-800 focus:border-primary focus:ring-0 text-slate-100 rounded pl-10 py-3 transition-all glow-input" placeholder="Arjun Sharma" required="" type="text"/>
+</div>
+</div>
+<!-- Phone Number Field -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Phone Number</label>
+<div class="relative flex">
+<div class="flex items-center px-3 bg-slate-900/60 border border-r-0 border-slate-800 rounded-l text-slate-400 text-sm">
+                            +91
+                        </div>
+<input class="w-full bg-slate-900/40 border-slate-800 focus:border-primary focus:ring-0 text-slate-100 rounded-r py-3 transition-all glow-input" placeholder="98765 43210" required="" type="tel"/>
+</div>
+</div>
+<!-- State Dropdown -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 ml-1">State</label>
+<div class="relative">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">map</span>
+<select class="w-full bg-slate-900/40 border-slate-800 focus:border-primary focus:ring-0 text-slate-100 rounded pl-10 py-3 appearance-none transition-all glow-input">
+<option disabled="" selected="" value="">Select your state</option>
+<option value="MH">Maharashtra</option>
+<option value="KA">Karnataka</option>
+<option value="DL">Delhi</option>
+<option value="TN">Tamil Nadu</option>
+<option value="WB">West Bengal</option>
+<option value="UP">Uttar Pradesh</option>
+<option value="GJ">Gujarat</option>
+</select>
+<span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Language Dropdown -->
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Preferred Language</label>
+<div class="relative">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">language</span>
+<select class="w-full bg-slate-900/40 border-slate-800 focus:border-primary focus:ring-0 text-slate-100 rounded pl-10 py-3 appearance-none transition-all glow-input">
+<option value="en">English</option>
+<option value="hi">Hindi (हिंदी)</option>
+<option value="mr">Marathi (मराठी)</option>
+<option value="ta">Tamil (தமிழ்)</option>
+<option value="bn">Bengali (বাংলা)</option>
+</select>
+<span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-lg mt-4 transition-transform active:scale-95 shadow-[0_0_20px_rgba(29,201,92,0.3)]" type="submit">
+                    Create Account
+                </button>
+</form>
+<div class="mt-8 pt-6 border-t border-slate-800 text-center">
+<p class="text-sm text-slate-500 dark:text-slate-400">
+                    Already have an account? 
+                    <a class="text-primary font-semibold ml-1" href="#">Sign In</a>
+</p>
+</div>
+</div>
+<!-- Footer Info -->
+<div class="mt-8 flex items-center justify-center space-x-2 text-slate-500/50">
+<span class="material-icons text-xs">verified_user</span>
+<span class="text-[10px] uppercase tracking-widest font-medium">AI Verification Secured</span>
+</div>
+<!-- Home Indicator (iOS style) -->
+<div class="mt-8 mx-auto w-32 h-1.5 bg-slate-800/40 rounded-full"></div>
+</div>
+<!-- Background Images for style compliance -->
+<div class="hidden">
+<img data-alt="Abstract green glowing forest patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDgYZp7ZjFBUIz_vL3pkdujdtjNPJDu-4KbDMbRlEKs0lLn1JMrGfJyIzNjH-vchuzvFxy0gUoS9-VAJVK6ye5DuW0ZsaeB25eYckJidu2evHnF-X1k_IkYu4KlwKIavkXleusjlBIO01HNTJioMfJJUdligQyFUZa84qLqpjxxRvJ85okuG46H8hI9w4xbzlwYz9rvn5miLp784hncPKoGcyov3wlQF4HfNnq1Hy13hgl5Mh8czvEIJ_0Jc0A9zZQqQd11nti_ti7"/>
+<img data-alt="Satellite view of lush Indian landscape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZz43VSiV2qZJYcTSKhWCNqBefp9GQ4czEn_CDB70TjKcGQwfESQmlHQYirYPo91xqJVnPqaGzHuMrIEf9Vq1fdFuFrHmqK8kVV2Wj3uxFTDxutKKhGxR_QD335RZZcQY-Li2qTZ8y2MMAW_MTCYFpUCn7c_Tj4BXAjfMKgAzzoMo3YUVD27uNkMXssfK3mv03ascY9S1v-eI_EIZqq4y9kTpKUjr5xxHevpQP3hlZFF1ugypdzeS4K06HVQem_XVk8xuXR8eG56aq"/>
+<div data-location="India" style=""></div>
+</div>
+</body></html>
