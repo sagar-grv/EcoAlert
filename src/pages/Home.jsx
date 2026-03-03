@@ -2,14 +2,16 @@ import React from 'react';
 import PostCard from '../components/PostCard';
 import CategoryFilter from '../components/CategoryFilter';
 import RightSidebar from '../components/RightSidebar';
+import FeedSkeleton from '../components/FeedSkeleton';
 import { useApp } from '../context/AppContext';
 import { useLang } from '../context/LangContext';
 import { Leaf } from 'lucide-react';
 
 export default function Home() {
-    const { getFilteredPosts } = useApp();
+    const { getFilteredPosts, feedLoading } = useApp();
     const { t } = useLang();
     const posts = getFilteredPosts();
+
 
     return (
         <div className="home-layout">
@@ -24,7 +26,9 @@ export default function Home() {
 
                 <CategoryFilter />
 
-                {posts.length === 0 ? (
+                {feedLoading ? (
+                    <FeedSkeleton count={3} />
+                ) : posts.length === 0 ? (
                     <div className="feed-empty">
                         <div className="feed-empty-icon">🌿</div>
                         <div className="feed-empty-text">{t('noPostsFound')}</div>

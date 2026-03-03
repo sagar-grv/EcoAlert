@@ -1,44 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, User, ArrowRight, Leaf, Globe } from 'lucide-react';
+import { Phone, User, ArrowRight, Leaf, Globe, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LangContext';
 import { LANGUAGES } from '../i18n/translations';
+import { FIREBASE_ENABLED } from '../firebase';
+import { RecaptchaVerifier } from '../firebase';
+import { auth } from '../firebase';
 
 export default function LoginPage() {
-    const { login } = useAuth();
+    const { login, loginWithGoogle, sendOTP, verifyOTP, authError } = useAuth();
     const { t, lang, setLang } = useLang();
     const navigate = useNavigate();
 
+    // Mode: 'phone' | 'otp'
+    const [mode, setMode] = useState('phone');
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
+    const [otp, setOtp] = useState('');
     const [err, setErr] = useState('');
     const [loading, setLoading] = useState(false);
+    const [confirmation, setConfirmation] = useState(null);
+    const recaptchaRef = useRef(null);
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        if (!name.trim()) { setErr('Please enter your name.'); return; }
-        if (!phone.trim() || phone.trim().length < 6) { setErr('Please enter a valid phone number.'); return; }
-        setLoading(true);
-        setTimeout(() => {
-            login({ name: name.trim(), phone: phone.trim(), lang });
+    useEffect(() => {
+        setErr(authError);
+    }, [authError]);
+
+    // ── Google Sign-In ─────────────────────────────────────
+    async function handleGoogle() {
+        setLoading(true); setErr('');
+        try {
+            await loginWithGoogle();
             navigate('/');
-        }, 800);
+        } catch (e) {
+            setErr(e.message || 'Google sign-in failed');
+        } finally { setLoading(false); }
     }
 
-    function handleGoogle() {
+    // ── Demo / Phone form submit ───────────────────────────
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setErr('');
+        if (!name.trim()) { setErr('Please enter your name.'); return; }
+        if (!phone.trim() || phone.trim().length < 6) { setErr('Please enter a valid phone number.'); return; }
+
+        if (!FIREBASE_ENABLED) {
+            // Demo mode: instant login
+            setLoading(true);
+            setTimeout(() => { login({ name: name.trim(), phone: phone.trim(), lang }); navigate('/'); }, 600);
+            return;
+        }
+
+        // Firebase Phone OTP
         setLoading(true);
-        const mockNames = ['Priya Sharma', 'Rahul Verma', 'Anjali Rao', 'Vikram Singh', 'Meera Pillai'];
-        const n = mockNames[Math.floor(Math.random() * mockNames.length)];
-        setTimeout(() => {
-            login({ name: n, phone: '9900000000', lang });
+        try {
+            if (!recaptchaRef.current) {
+                recaptchaRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    size: 'invisible',
+                    callback: () => { },
+                });
+            }
+            const fullPhone = phone.startsWith('+') ? phone : `+91${phone}`;
+            const conf = await sendOTP(fullPhone, recaptchaRef.current);
+            setConfirmation(conf);
+            setMode('otp');
+        } catch (e) {
+            setErr(e.message || 'Failed to send OTP');
+        } finally { setLoading(false); }
+    }
+
+    // ── Verify OTP ─────────────────────────────────────────
+    async function handleVerifyOTP(e) {
+        e.preventDefault();
+        if (!otp || otp.length < 6) { setErr('Enter the 6-digit OTP'); return; }
+        setLoading(true); setErr('');
+        try {
+            await verifyOTP(confirmation, otp, name);
             navigate('/');
-        }, 600);
+        } catch (e) {
+            setErr('Invalid OTP. Please try again.');
+        } finally { setLoading(false); }
     }
 
     return (
         <div className="auth-page">
-            {/* Background blobs */}
             <div className="auth-blob auth-blob-1" />
             <div className="auth-blob auth-blob-2" />
 
@@ -55,61 +101,77 @@ export default function LoginPage() {
                 {/* Language Selector */}
                 <div className="auth-lang-row">
                     <Globe size={14} style={{ color: 'var(--text-sub)' }} />
-                    <select
-                        className="auth-lang-select"
-                        value={lang}
-                        onChange={e => setLang(e.target.value)}
-                    >
+                    <select className="auth-lang-select" value={lang} onChange={e => setLang(e.target.value)}>
                         {LANGUAGES.map(l => (
-                            <option key={l.code} value={l.code}>
-                                {l.flag} {l.native}
-                            </option>
+                            <option key={l.code} value={l.code}>{l.flag} {l.native}</option>
                         ))}
                     </select>
                 </div>
 
+                {/* Firebase badge */}
+                {FIREBASE_ENABLED && (
+                    <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--green)', background: 'var(--green-glow)', padding: '2px 10px', borderRadius: 999, fontWeight: 600 }}>
+                            🔒 Secured by Firebase
+                        </span>
+                    </div>
+                )}
+
                 <h1 className="auth-title">{t('login')}</h1>
                 <p className="auth-demo-hint">
-                    ✨ {t('demoHint')}
+                    {FIREBASE_ENABLED ? '🔐 Sign in with Google or your phone number' : `✨ ${t('demoHint')}`}
                 </p>
 
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <div className="auth-field">
-                        <User size={16} className="auth-field-icon" />
-                        <input
-                            className="auth-input"
-                            type="text"
-                            placeholder={t('enterName')}
-                            value={name}
-                            onChange={e => { setName(e.target.value); setErr(''); }}
-                            autoComplete="name"
-                        />
-                    </div>
-                    <div className="auth-field">
-                        <Phone size={16} className="auth-field-icon" />
-                        <input
-                            className="auth-input"
-                            type="tel"
-                            placeholder={t('enterPhone')}
-                            value={phone}
-                            onChange={e => { setPhone(e.target.value.replace(/\D/g, '')); setErr(''); }}
-                            maxLength={10}
-                            autoComplete="tel"
-                        />
-                    </div>
-                    {err && <div className="auth-error">{err}</div>}
-                    <button
-                        type="submit"
-                        className="btn-primary btn-full"
-                        disabled={loading}
-                        style={{ marginTop: 4 }}
-                    >
-                        {loading
-                            ? <span className="spinning" style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
-                            : <><span>{t('continueBtn')}</span><ArrowRight size={16} /></>
-                        }
-                    </button>
-                </form>
+                {/* Phone + Name form OR OTP form */}
+                {mode === 'phone' ? (
+                    <form className="auth-form" onSubmit={handleSubmit}>
+                        <div className="auth-field">
+                            <User size={16} className="auth-field-icon" />
+                            <input className="auth-input" type="text" placeholder={t('enterName')}
+                                value={name} onChange={e => { setName(e.target.value); setErr(''); }} autoComplete="name" />
+                        </div>
+                        <div className="auth-field">
+                            <Phone size={16} className="auth-field-icon" />
+                            <input className="auth-input" type="tel"
+                                placeholder={FIREBASE_ENABLED ? '+91 Phone number' : t('enterPhone')}
+                                value={phone} onChange={e => { setPhone(e.target.value.replace(/[^\d+]/g, '')); setErr(''); }}
+                                maxLength={13} autoComplete="tel" />
+                        </div>
+                        {err && <div className="auth-error">{err}</div>}
+                        <button type="submit" className="btn-primary btn-full" disabled={loading} style={{ marginTop: 4 }}>
+                            {loading
+                                ? <span className="spinning" style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
+                                : <><span>{FIREBASE_ENABLED ? 'Send OTP' : t('continueBtn')}</span><ArrowRight size={16} /></>
+                            }
+                        </button>
+                    </form>
+                ) : (
+                    <form className="auth-form" onSubmit={handleVerifyOTP}>
+                        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-sub)', margin: '0 0 12px' }}>
+                            OTP sent to <strong>{phone}</strong>
+                        </p>
+                        <div className="auth-field">
+                            <KeyRound size={16} className="auth-field-icon" />
+                            <input className="auth-input" type="number" placeholder="Enter 6-digit OTP"
+                                value={otp} onChange={e => { setOtp(e.target.value); setErr(''); }}
+                                maxLength={6} autoFocus />
+                        </div>
+                        {err && <div className="auth-error">{err}</div>}
+                        <button type="submit" className="btn-primary btn-full" disabled={loading} style={{ marginTop: 4 }}>
+                            {loading
+                                ? <span className="spinning" style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
+                                : <><span>Verify OTP</span><ArrowRight size={16} /></>
+                            }
+                        </button>
+                        <button type="button" className="auth-link" style={{ marginTop: 8, display: 'block', textAlign: 'center', width: '100%' }}
+                            onClick={() => { setMode('phone'); setOtp(''); setErr(''); }}>
+                            ← Change number
+                        </button>
+                    </form>
+                )}
+
+                {/* Recaptcha container (invisible) */}
+                <div id="recaptcha-container" />
 
                 {/* Divider */}
                 <div className="auth-divider">
@@ -131,9 +193,7 @@ export default function LoginPage() {
 
                 <p className="auth-switch">
                     {t('noAccount')}{' '}
-                    <button className="auth-link" onClick={() => navigate('/signup')}>
-                        {t('signup')}
-                    </button>
+                    <button className="auth-link" onClick={() => navigate('/signup')}>{t('signup')}</button>
                 </p>
             </div>
         </div>

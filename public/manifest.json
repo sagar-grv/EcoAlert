@@ -1,0 +1,23 @@
+{
+    "name": "EcoAlert",
+    "short_name": "EcoAlert",
+    "description": "Report and track environmental issues in India with AI-powered analysis.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#07070a",
+    "theme_color": "#22c55e",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "categories": [
+        "education",
+        "social",
+        "news"
+    ],
+    "lang": "en-IN"
+}

@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LangProvider } from './context/LangContext';
-import { AppProvider } from './context/AppContext';
+import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import CreatePost from './components/CreatePost';
+import Toast from './components/Toast';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import NearMe from './pages/NearMe';
@@ -20,11 +21,12 @@ const Spinner = () => (
     </div>
 );
 
-/* Authenticated shell — includes Navbar, BottomNav and all protected pages */
+/* Authenticated shell */
 function AppShell() {
     const [showCreate, setShowCreate] = useState(false);
+    const { toast } = useApp();
     return (
-        <AppProvider>
+        <>
             <Navbar onCreatePost={() => setShowCreate(true)} />
             <div className="app-body">
                 <Routes>
@@ -37,7 +39,8 @@ function AppShell() {
             </div>
             <BottomNav onCreatePost={() => setShowCreate(true)} />
             {showCreate && <CreatePost onClose={() => setShowCreate(false)} />}
-        </AppProvider>
+            <Toast toast={toast} />
+        </>
     );
 }
 
@@ -47,11 +50,13 @@ function RootRouter() {
     if (loading) return <Spinner />;
     return (
         <Routes>
-            {/* Auth pages — redirect to home if already logged in */}
             <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
             <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignupPage />} />
-            {/* Everything else requires auth */}
-            <Route path="/*" element={user ? <AppShell /> : <Navigate to="/login" replace />} />
+            <Route path="/*" element={user ? (
+                <AppProvider>
+                    <AppShell />
+                </AppProvider>
+            ) : <Navigate to="/login" replace />} />
         </Routes>
     );
 }

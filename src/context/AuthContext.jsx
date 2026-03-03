@@ -1,165 +1,154 @@
-// ─── Auth Context ─────────────────────────────────────────
-// Enhanced auth system with social media features
+// ─── Auth Context ─────────────────────────────────────────────
+// Production: uses Firebase Auth (Google popup + Phone OTP).
+// Demo mode: falls back to localStorage mock auth when Firebase is not configured.
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+    onAuthStateChanged, signInWithPopup, signOut,
+    signInWithPhoneNumber, updateProfile,
+} from 'firebase/auth';
+import { auth, googleProvider, FIREBASE_ENABLED } from '../firebase';
+import { saveUserProfile, getUserProfile } from '../services/firestoreService';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [authError, setAuthError] = useState('');
 
     useEffect(() => {
-        const saved = localStorage.getItem('envirox_user');
-        if (saved) {
-            try { setUser(JSON.parse(saved)); } catch (_) { }
+        if (FIREBASE_ENABLED) {
+            // Production: listen to Firebase auth state
+            const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+                if (firebaseUser) {
+                    // Merge Firestore profile (displayName, lang, etc.)
+                    const profile = await getUserProfile(firebaseUser.uid);
+                    setUser({
+                        uid: firebaseUser.uid,
+                        name: profile?.name || firebaseUser.displayName || 'User',
+                        email: firebaseUser.email,
+                        phone: firebaseUser.phoneNumber || profile?.phone || '',
+                        avatar: firebaseUser.photoURL || profile?.avatar || null,
+                        lang: profile?.lang || 'en',
+                        state: profile?.state || '',
+                    });
+                } else {
+                    setUser(null);
+                }
+                setLoading(false);
+            });
+            return unsub;
+        } else {
+            // Demo mode: read from localStorage
+            const saved = localStorage.getItem('ecoalert_user');
+            if (saved) {
+                try { setUser(JSON.parse(saved)); } catch { /* ignore */ }
+            }
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
-    function login({ name, phone, email, bio, lang = 'en', avatar, isVerified = false }) {
-        const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-        let newUser;
-        
-        // Check if user already exists
-        const existingUser = Object.values(savedUsers).find(u => u.email === email || u.phone === phone);
-        
-        if (existingUser) {
-            // Return existing user if found
-            newUser = existingUser;
-        } else {
-            // Create new user
-            newUser = {
-                id: 'u_' + Date.now(),
-                name,
-                phone,
-                email,
-                bio: bio || '',
-                lang,
-                avatar: avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
-                handle: '@' + name.toLowerCase().replace(/\s+/g, '_'),
-                joinedAt: new Date().toISOString(),
-                followers: [],
-                following: [],
-                tweets: [],
-                likes: [],
-                bookmarks: [],
-                isVerified,
-                isOnline: true,
-            };
-            
-            // Save new user to users list
-            savedUsers[newUser.id] = newUser;
-            localStorage.setItem('envirox_users', JSON.stringify(savedUsers));
+    /* ── Google Sign-In ──────────────────────────────────────── */
+    async function loginWithGoogle() {
+        setAuthError('');
+        if (!FIREBASE_ENABLED) {
+            // Demo fallback
+            const mockNames = ['Priya Sharma', 'Rahul Verma', 'Anjali Rao', 'Vikram Singh', 'Meera Pillai'];
+            const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+            const u = { uid: `demo_${Date.now()}`, name, email: `${name.replace(' ', '').toLowerCase()}@demo.com`, lang: 'en', avatar: null };
+            localStorage.setItem('ecoalert_user', JSON.stringify(u));
+            setUser(u);
+            return;
         }
-        
-        setUser(newUser);
-        localStorage.setItem('envirox_user', JSON.stringify(newUser));
-        return newUser;
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const u = result.user;
+            await saveUserProfile(u.uid, {
+                name: u.displayName,
+                email: u.email,
+                avatar: u.photoURL,
+                lang: 'en',
+                createdAt: new Date().toISOString(),
+            });
+        } catch (err) {
+            setAuthError(err.message);
+            throw err;
+        }
     }
 
-    function logout() {
-        if (user) {
-            // Update user's online status
-            const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-            if (savedUsers[user.id]) {
-                savedUsers[user.id].isOnline = false;
-                localStorage.setItem('envirox_users', JSON.stringify(savedUsers));
-            }
+    /* ── Phone OTP Sign-In ───────────────────────────────────── */
+    async function sendOTP(phoneNumber, recaptchaVerifier) {
+        if (!FIREBASE_ENABLED) throw new Error('Firebase not configured');
+        setAuthError('');
+        try {
+            const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+            return confirmation;
+        } catch (err) {
+            setAuthError(err.message);
+            throw err;
         }
+    }
+
+    async function verifyOTP(confirmation, otp, name) {
+        setAuthError('');
+        try {
+            const result = await confirmation.confirm(otp);
+            const u = result.user;
+            if (name) await updateProfile(u, { displayName: name });
+            await saveUserProfile(u.uid, {
+                name: name || u.displayName || 'User',
+                phone: u.phoneNumber,
+                lang: 'en',
+                createdAt: new Date().toISOString(),
+            });
+        } catch (err) {
+            setAuthError(err.message);
+            throw err;
+        }
+    }
+
+    /* ── Mock login (demo) ───────────────────────────────────── */
+    function login({ name, phone, lang = 'en' }) {
+        const u = {
+            uid: `demo_${Date.now()}`,
+            name,
+            phone,
+            lang,
+            avatar: null,
+            email: '',
+            state: '',
+        };
+        localStorage.setItem('ecoalert_user', JSON.stringify(u));
+        setUser(u);
+    }
+
+    /* ── Logout ──────────────────────────────────────────────── */
+    async function logout() {
+        if (FIREBASE_ENABLED) {
+            await signOut(auth);
+        }
+        localStorage.removeItem('ecoalert_user');
         setUser(null);
-        localStorage.removeItem('envirox_user');
     }
 
-    function updateProfile(updates) {
+    /* ── Update lang preference ──────────────────────────────── */
+    async function updateLang(langCode) {
         if (!user) return;
-        
-        const updatedUser = { ...user, ...updates };
-        setUser(updatedUser);
-        localStorage.setItem('envirox_user', JSON.stringify(updatedUser));
-        
-        // Update in users list as well
-        const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-        if (savedUsers[user.id]) {
-            savedUsers[user.id] = { ...savedUsers[user.id], ...updates };
-            localStorage.setItem('envirox_users', JSON.stringify(savedUsers));
-        }
-    }
-    
-    function followUser(targetUserId) {
-        if (!user) return false;
-        
-        const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-        
-        if (!savedUsers[targetUserId]) return false;
-        
-        // Add to current user's following
-        if (!user.following.includes(targetUserId)) {
-            const updatedFollowing = [...user.following, targetUserId];
-            updateProfile({ following: updatedFollowing });
-        }
-        
-        // Add current user to target user's followers
-        if (!savedUsers[targetUserId].followers.includes(user.id)) {
-            savedUsers[targetUserId].followers.push(user.id);
-            localStorage.setItem('envirox_users', JSON.stringify(savedUsers));
-        }
-        
-        return true;
-    }
-    
-    function unfollowUser(targetUserId) {
-        if (!user) return false;
-        
-        const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-        
-        if (!savedUsers[targetUserId]) return false;
-        
-        // Remove from current user's following
-        const updatedFollowing = user.following.filter(id => id !== targetUserId);
-        updateProfile({ following: updatedFollowing });
-        
-        // Remove current user from target user's followers
-        savedUsers[targetUserId].followers = savedUsers[targetUserId].followers.filter(id => id !== user.id);
-        localStorage.setItem('envirox_users', JSON.stringify(savedUsers));
-        
-        return true;
-    }
-    
-    function updateLang(lang) {
-        if (!user) return;
-        const updated = { ...user, lang };
+        const updated = { ...user, lang: langCode };
         setUser(updated);
-        localStorage.setItem('envirox_user', JSON.stringify(updated));
-        
-        // Update in users list as well
-        const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-        if (savedUsers[user.id]) {
-            savedUsers[user.id].lang = lang;
-            localStorage.setItem('envirox_users', JSON.stringify(savedUsers));
+        if (FIREBASE_ENABLED && user.uid) {
+            await saveUserProfile(user.uid, { lang: langCode });
+        } else {
+            localStorage.setItem('ecoalert_user', JSON.stringify(updated));
         }
-    }
-    
-    function getUserById(userId) {
-        const savedUsers = JSON.parse(localStorage.getItem('envirox_users') || '{}');
-        return savedUsers[userId] || null;
-    }
-    
-    function getAllUsers() {
-        return JSON.parse(localStorage.getItem('envirox_users') || '{}');
     }
 
     return (
-        <AuthContext.Provider value={{ 
-            user, 
-            login, 
-            logout, 
-            updateProfile,
-            followUser,
-            unfollowUser,
-            getUserById,
-            getAllUsers,
-            updateLang, 
-            loading 
+        <AuthContext.Provider value={{
+            user, loading, authError,
+            login, loginWithGoogle, sendOTP, verifyOTP, logout, updateLang,
+            isFirebase: FIREBASE_ENABLED,
         }}>
             {children}
         </AuthContext.Provider>

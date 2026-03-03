@@ -1,14 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // ── Posts ─────────────────────────────────────────────────
     match /posts/{postId} {
+      // Anyone (even unauthenticated) can read posts
       allow read: if true;
-      allow create, update: if true;
-      allow delete: if true;
+
+      // Only signed-in users can create posts
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.caption is string
+        && request.resource.data.caption.size() > 0
+        && request.resource.data.caption.size() <= 1000;
+
+      // Only the post owner can update their post
+      // BUT any signed-in user can update likes/likedBy fields
+      allow update: if isSignedIn() && (
+        isOwner(resource.data.userId) ||
+        (request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['likes', 'likedBy']))
+      );
+
+      // Only the post owner can delete
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
     }
-    match /posts/{postId}/comments/{commentId} {
+
+    // ── Users ─────────────────────────────────────────────────
+    match /users/{userId} {
+      // Anyone can read user profiles
       allow read: if true;
-      allow create, update, delete: if true;
+
+      // Users can only write their own profile
+      allow write: if isSignedIn() && isOwner(userId);
     }
+
   }
 }
