@@ -24,9 +24,9 @@ export function AppProvider({ children }) {
     const [posts, setPosts] = useState(() => {
         if (FIREBASE_ENABLED) return []; // Firestore will populate
         const version = localStorage.getItem('ecoalert_posts_version');
-        if (version !== '2') {
+        if (version !== '4') {
             localStorage.removeItem('ecoalert_posts');
-            localStorage.setItem('ecoalert_posts_version', '2');
+            localStorage.setItem('ecoalert_posts_version', '4');
             return mockPosts;
         }
         const saved = localStorage.getItem('ecoalert_posts');
@@ -108,6 +108,7 @@ export function AppProvider({ children }) {
                 fakeNews: analysis.fakeNews,
                 risk: analysis.risk,
                 suggestions: analysis.suggestions,
+                imageVerification: analysis.imageVerification,
                 liked: false,
                 likedBy: [],
                 likes: 0,
@@ -127,6 +128,7 @@ export function AppProvider({ children }) {
                 fakeNews: analysis.fakeNews,
                 risk: analysis.risk,
                 suggestions: analysis.suggestions,
+                imageVerification: analysis.imageVerification,
                 timestamp: new Date().toISOString(),
                 liked: false,
                 likedBy: [],
@@ -169,6 +171,21 @@ export function AppProvider({ children }) {
         }
     }
 
+    // ── Increment comment count (local) ───────────────────────
+    function incrementCommentCount(postId) {
+        if (!FIREBASE_ENABLED) {
+            setPosts((prev) => {
+                const newPosts = prev.map((p) =>
+                    p.id === postId
+                        ? { ...p, commentCount: (p.commentCount || 0) + 1 }
+                        : p
+                );
+                localStorage.setItem('localPosts', JSON.stringify(newPosts));
+                return newPosts;
+            });
+        }
+    }
+
     // ── Filtered posts ────────────────────────────────────────
     const getFilteredPosts = useCallback(() => {
         return posts.filter((p) => {
@@ -192,6 +209,7 @@ export function AppProvider({ children }) {
             searchQuery, setSearchQuery,
             addPost, toggleLike,
             getFilteredPosts,
+            incrementCommentCount
         }}>
             {children}
         </AppContext.Provider>

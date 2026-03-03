@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Search, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,14 +12,23 @@ export default function RightSidebar() {
         .sort((a, b) => b.likes - a.likes)
         .slice(0, 5);
 
-    // Category counts
-    const categories = ['Air', 'Water', 'Land', 'Wildlife', 'Climate', 'Disaster'];
-    const catEmoji = { Air: '💨', Water: '💧', Land: '🌍', Wildlife: '🐾', Climate: '🌡️', Disaster: '🚨' };
-    const catCounts = categories.map(cat => ({
-        name: cat,
-        emoji: catEmoji[cat],
-        count: posts.filter(p => p.category === cat).length,
-    })).sort((a, b) => b.count - a.count);
+    // Hashtag extraction for trending
+    const hashtagCounts = {};
+    posts.forEach(p => {
+        if (!p.caption) return;
+        const matches = p.caption.match(/#\w+/g);
+        if (matches) {
+            matches.forEach(tag => {
+                const lowerTag = tag.toLowerCase();
+                hashtagCounts[lowerTag] = (hashtagCounts[lowerTag] || 0) + 1;
+            });
+        }
+    });
+
+    const trendingTags = Object.entries(hashtagCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([tag, count]) => ({ tag, count }));
 
     return (
         <>
@@ -48,7 +57,7 @@ export default function RightSidebar() {
                                     {post.caption.slice(0, 60)}{post.caption.length > 60 ? '…' : ''}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)', marginTop: 2 }}>
-                                    📍 {post.location.city}
+                                    📍 {post.location?.city || 'Unknown'}
                                 </div>
                             </div>
                         </div>
@@ -56,34 +65,61 @@ export default function RightSidebar() {
                 </div>
             )}
 
-            {/* Trending Widget */}
+            {/* Top Posts Widget */}
             <div className="rs-widget">
                 <div className="rs-widget-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <TrendingUp size={16} style={{ color: 'var(--green)' }} />
-                    Trending in Environment
+                    Trending Hashtags
                 </div>
-                {catCounts.map((cat, i) => (
-                    <div className="trend-item" key={cat.name} onClick={() => navigate('/explore')}>
+                {trendingTags.length > 0 ? trendingTags.map((trend, i) => (
+                    <div className="trend-item" key={trend.tag} onClick={() => setSearchQuery(trend.tag)}>
                         <div className="trend-info">
                             <div className="trend-category">Environment · Trending</div>
-                            <div className="trend-name">{cat.emoji} {cat.name} Issues</div>
-                            <div className="trend-count">{cat.count} report{cat.count !== 1 ? 's' : ''}</div>
+                            <div className="trend-name" style={{ color: 'var(--text-main)', fontWeight: 600 }}>{trend.tag}</div>
+                            <div className="trend-count">{trend.count} post{trend.count !== 1 ? 's' : ''}</div>
                         </div>
                         <div className="trend-rank">···</div>
                     </div>
-                ))}
+                )) : (
+                    <div style={{ padding: '12px 16px', fontSize: '0.85rem', color: 'var(--text-sub)' }}>
+                        No trending hashtags yet.
+                    </div>
+                )}
                 <button className="rs-show-more" onClick={() => navigate('/explore')}>
                     Show more
                 </button>
             </div>
 
+            {/* Eco-Leaderboard Widget */}
+            <div className="rs-widget">
+                <div className="rs-widget-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Zap size={16} style={{ color: 'var(--amber)' }} fill="var(--amber)" />
+                    Top Eco-Warriors
+                </div>
+                {[
+                    { name: 'Dr. Ishaan Bhat', points: 1420, badge: 'Veteran' },
+                    { name: 'Arjun Mehra', points: 1250, badge: 'Activist' },
+                    { name: 'Priyanka G.', points: 980, badge: 'Reporter' },
+                ].map((u, i) => (
+                    <div className="trend-item" key={u.name} style={{ cursor: 'pointer' }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-card2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)' }}>
+                            {i + 1}
+                        </div>
+                        <div className="trend-info" style={{ marginLeft: 10 }}>
+                            <div className="trend-name" style={{ fontSize: '0.82rem', fontWeight: 600 }}>{u.name}</div>
+                            <div className="trend-count">{u.points} Impact Points · {u.badge}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             {/* Top Posts Widget */}
             <div className="rs-widget">
-                <div className="rs-widget-title">🔥 Most Liked</div>
+                <div className="rs-widget-title">🔥 Most Liked Reports</div>
                 {trending.slice(0, 3).map(post => (
                     <div className="trend-item" key={post.id} onClick={() => navigate('/')}>
                         <div className="trend-info">
-                            <div className="trend-category">📍 {post.location.city}</div>
+                            <div className="trend-category">📍 {post.location?.city || 'Unknown'}</div>
                             <div className="trend-name" style={{ fontSize: '0.85rem' }}>
                                 {post.caption.slice(0, 55)}{post.caption.length > 55 ? '…' : ''}
                             </div>

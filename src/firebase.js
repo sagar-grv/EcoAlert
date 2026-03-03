@@ -23,15 +23,23 @@ export const FIREBASE_ENABLED = !!(
     firebaseConfig.appId
 );
 
-let app, auth, db, storage, googleProvider;
+export let app = null;
+export let auth = null;
+export let db = null;
+export let storage = null;
+export let googleProvider = null;
 
 if (FIREBASE_ENABLED) {
-    app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    storage = getStorage(app);
-    googleProvider = new GoogleAuthProvider();
-    googleProvider.setCustomParameters({ prompt: 'select_account' });
+    try {
+        app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        storage = getStorage(app);
+        googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+    }
 }
 
-export { auth, db, storage, googleProvider, RecaptchaVerifier };
+export { RecaptchaVerifier };

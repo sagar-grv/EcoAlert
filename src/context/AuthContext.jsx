@@ -144,11 +144,32 @@ export function AuthProvider({ children }) {
         }
     }
 
+    /* ── Update user profile ─────────────────────────────────── */
+    async function updateUserProfile(updates) {
+        if (!user) return;
+
+        if (FIREBASE_ENABLED && auth.currentUser) {
+            if (updates.displayName && updates.displayName !== auth.currentUser.displayName) {
+                await updateProfile(auth.currentUser, { displayName: updates.displayName });
+            }
+            await saveUserProfile(user.uid, updates);
+        }
+
+        const updated = { ...user, name: updates.displayName || user.name, ...updates };
+        delete updated.displayName; // keep it normalized as `name`
+
+        setUser(updated);
+        if (!FIREBASE_ENABLED) {
+            localStorage.setItem('ecoalert_user', JSON.stringify(updated));
+        }
+    }
+
     return (
         <AuthContext.Provider value={{
             user, loading, authError,
             login, loginWithGoogle, sendOTP, verifyOTP, logout, updateLang,
-            isFirebase: FIREBASE_ENABLED,
+            updateUserProfile,
+            isFirebase: FIREBASE_ENABLED
         }}>
             {children}
         </AuthContext.Provider>

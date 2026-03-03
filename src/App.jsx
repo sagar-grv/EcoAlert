@@ -13,13 +13,9 @@ import NearMe from './pages/NearMe';
 import Analysis from './pages/Analysis';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-
-/* Loading spinner */
-const Spinner = () => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <div style={{ width: 40, height: 40, border: '3px solid var(--glass-border)', borderTopColor: 'var(--green)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-    </div>
-);
+import LandingPage from './pages/LandingPage';
+import ProfilePage from './pages/ProfilePage';
+import Spinner from './components/Spinner';
 
 /* Authenticated shell */
 function AppShell() {
@@ -34,6 +30,7 @@ function AppShell() {
                     <Route path="/explore" element={<Explore />} />
                     <Route path="/near-me" element={<NearMe />} />
                     <Route path="/analysis" element={<Analysis />} />
+                    <Route path="/profile/:id" element={<ProfilePage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </div>
@@ -50,13 +47,14 @@ function RootRouter() {
     if (loading) return <Spinner />;
     return (
         <Routes>
+            <Route path="/welcome" element={user ? <Navigate to="/" replace /> : <LandingPage />} />
             <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
             <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignupPage />} />
             <Route path="/*" element={user ? (
                 <AppProvider>
                     <AppShell />
                 </AppProvider>
-            ) : <Navigate to="/login" replace />} />
+            ) : <Navigate to="/welcome" replace />} />
         </Routes>
     );
 }

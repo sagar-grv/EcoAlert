@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload, MapPin, Loader, CheckCircle, Sparkles, Image } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { autoCategorizePost } from '../services/geminiService';
 
 const CATEGORIES = ['Air', 'Water', 'Land', 'Wildlife', 'Climate', 'Disaster'];
 const CAT_EMOJI = { Air: '💨', Water: '💧', Land: '🌍', Wildlife: '🐾', Climate: '🌡️', Disaster: '🚨' };
@@ -21,15 +22,17 @@ const INDIAN_CITIES = [
 ];
 
 export default function CreatePost({ onClose }) {
-    const { addPost } = useApp();
+    const { addPost, showToast } = useApp();
     const [caption, setCaption] = useState('');
     const [category, setCategory] = useState('Air');
     const [selectedCity, setSelectedCity] = useState(INDIAN_CITIES[0]);
     const [preview, setPreview] = useState(null);
     const [imageSrc, setImageSrc] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isCategorizing, setIsCategorizing] = useState(false);
     const [done, setDone] = useState(false);
     const fileRef = useRef();
+
 
     const handleFile = e => {
         const file = e.target.files[0];
@@ -39,20 +42,44 @@ export default function CreatePost({ onClose }) {
         reader.readAsDataURL(file);
     };
 
+    const handleAutoCategorize = async () => {
+        if (!caption.trim() && !imageSrc) {
+            showToast('Please add text or an image first to auto-categorize.', 'info');
+            return;
+        }
+        setIsCategorizing(true);
+        try {
+            const detectedCategory = await autoCategorizePost(caption, imageSrc);
+            setCategory(detectedCategory);
+            showToast(`AI Categorized as: ${detectedCategory}`);
+        } catch (err) {
+            console.error(err);
+            showToast('AI Categorization failed.', 'error');
+        } finally {
+            setIsCategorizing(false);
+        }
+    };
+
     const handleSubmit = async e => {
         e.preventDefault();
         if (!caption.trim()) return;
         setLoading(true);
-        await new Promise(r => setTimeout(r, 1400));
-        addPost({
+
+        let fileObj = null;
+        if (fileRef.current && fileRef.current.files && fileRef.current.files.length > 0) {
+            fileObj = fileRef.current.files[0];
+        }
+
+        await addPost({
             caption,
             category,
-            imageSrc,
+            imageSrc, // we pass this but AppContext ignores it, instead uses imageFile
             locationCity: selectedCity.city,
             locationState: selectedCity.state,
             locationLat: selectedCity.lat,
             locationLng: selectedCity.lng,
-        });
+        }, fileObj);
+
         setLoading(false);
         setDone(true);
         setTimeout(onClose, 1200);
@@ -173,8 +200,15 @@ export default function CreatePost({ onClose }) {
                                 <button type="button" className="toolbar-icon" title="Add location">
                                     <MapPin size={18} />
                                 </button>
-                                <button type="button" className="toolbar-icon" title="AI analysis">
-                                    <Sparkles size={18} />
+                                <button
+                                    type="button"
+                                    className="toolbar-icon"
+                                    title="Auto Categorize via AI"
+                                    onClick={handleAutoCategorize}
+                                    disabled={isCategorizing}
+                                    style={{ color: isCategorizing ? 'var(--green)' : '' }}
+                                >
+                                    <Sparkles size={18} className={isCategorizing ? "spinning" : ""} />
                                 </button>
                             </div>
 

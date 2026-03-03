@@ -89,3 +89,31 @@ export async function getUserProfile(uid) {
     const snap = await getDoc(doc(db, 'users', uid));
     return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
+
+/* ── Comments ────────────────────────────────────────────── */
+
+export function subscribeToComments(postId, callback) {
+    if (!FIREBASE_ENABLED) return () => { };
+    const q = query(
+        collection(db, `posts/${postId}/comments`),
+        orderBy('timestamp', 'asc')
+    );
+    return onSnapshot(q, (snap) => {
+        const comments = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        callback(comments);
+    });
+}
+
+export async function addCommentToFirestore(postId, commentData) {
+    if (!FIREBASE_ENABLED) return null;
+    const docRef = await addDoc(collection(db, `posts/${postId}/comments`), {
+        ...commentData,
+        timestamp: serverTimestamp(),
+    });
+    // Increment a cached counter on the post doc
+    const postRef = doc(db, 'posts', postId);
+    await updateDoc(postRef, {
+        commentCount: increment(1)
+    });
+    return docRef.id;
+}

@@ -51,14 +51,14 @@ export default function Navbar({ onCreatePost }) {
     // Get notification count (mock implementation)
     const notificationCount = 3;
     const messageCount = 5;
-    
+
     // Get sample notifications (mock implementation)
     const notifications = [
         { id: 1, type: 'like', user: 'EcoWarrior', content: 'liked your post', time: '2m ago' },
         { id: 2, type: 'follow', user: 'GreenActivist', content: 'started following you', time: '1h ago' },
         { id: 3, type: 'reply', user: 'ClimateExpert', content: 'replied to your post', time: '3h ago' },
     ];
-    
+
     // Get sample messages (mock implementation)
     const messages = [
         { id: 1, user: 'EcoWarrior', content: 'Thanks for sharing this!', time: '10m ago', unread: true },
@@ -93,7 +93,7 @@ export default function Navbar({ onCreatePost }) {
 
                     {/* Notifications */}
                     <div className="navbar-notification-wrap" ref={notificationRef}>
-                        <button 
+                        <button
                             className="navbar-icon-btn"
                             onClick={() => setNotificationOpen(!notificationOpen)}
                             title="Notifications"
@@ -132,7 +132,7 @@ export default function Navbar({ onCreatePost }) {
 
                     {/* Messages */}
                     <div className="navbar-message-wrap" ref={messageRef}>
-                        <button 
+                        <button
                             className="navbar-icon-btn"
                             onClick={() => setMessageOpen(!messageOpen)}
                             title="Messages"
@@ -205,7 +205,7 @@ export default function Navbar({ onCreatePost }) {
                                         </div>
                                     </div>
                                     <div className="nud-divider" />
-                                    <button className="nud-profile" onClick={() => {setAvatarOpen(false); navigate(`/profile/${user.id}`);}}>
+                                    <button className="nud-profile" onClick={() => { setAvatarOpen(false); navigate(`/profile/${user.uid || user.id}`); }}>
                                         <User size={14} />
                                         Profile
                                     </button>
