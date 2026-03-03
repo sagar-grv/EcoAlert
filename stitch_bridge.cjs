@@ -1,9 +1,8 @@
 
 const axios = require('axios');
-require('dotenv').config(); // Ensure dotenv is used to load the API key if run directly
 
 const serverUrl = 'https://stitch.googleapis.com/mcp';
-const apiKey = process.env.STITCH_API_KEY; // Removed exposed key AQ.Ab8RN6IDgHB275T60dbaXHWbeCP8p7Yn39kUkqXlc8tcupYuxQ
+const apiKey = 'AQ.Ab8RN6IDgHB275T60dbaXHWbeCP8p7Yn39kUkqXlc8tcupYuxQ';
 
 async function callStitch(method, params = {}) {
     try {

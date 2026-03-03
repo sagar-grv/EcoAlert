@@ -1,121 +1,134 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Phone, User, ArrowRight, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LangContext';
 import { LANGUAGES } from '../i18n/translations';
+
+const STATES = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+    'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+    'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+    'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+    'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Jammu & Kashmir',
+];
 
 export default function SignupPage() {
     const { login } = useAuth();
+    const { t, lang, setLang } = useLang();
     const navigate = useNavigate();
+
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [lang, setLang] = useState('en');
+    const [state, setState] = useState('');
+    const [err, setErr] = useState('');
     const [loading, setLoading] = useState(false);
 
-    async function handleSignup(e) {
+    function handleSubmit(e) {
         e.preventDefault();
-        if (!name.trim()) return;
+        if (!name.trim()) { setErr('Please enter your name.'); return; }
+        if (!phone.trim() || phone.trim().length < 6) { setErr('Please enter a valid phone number.'); return; }
         setLoading(true);
-        try {
-            await login({ name: name.trim(), phone, lang });
+        setTimeout(() => {
+            login({ name: name.trim(), phone: phone.trim(), lang });
             navigate('/');
-        } finally {
-            setLoading(false);
-        }
+        }, 900);
     }
 
     return (
-        <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-            <div className="relative w-full max-w-[420px] glass-panel border-[2px] rounded-[2rem] overflow-hidden flex flex-col">
-                <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none" />
-                <div className="absolute bottom-[-5%] right-[-5%] w-80 h-80 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="auth-page">
+            <div className="auth-blob auth-blob-1" />
+            <div className="auth-blob auth-blob-2" />
 
-                <div className="relative z-10 flex flex-col px-8 pt-14 pb-10">
-                    <div className="flex flex-col items-center mb-10">
-                        <div className="w-20 h-20 bg-primary/20 rounded-xl flex items-center justify-center mb-6 border border-primary/30 shadow-lg shadow-primary/20">
-                            <span className="material-symbols-outlined text-primary" style={{ fontSize: 48 }}>eco</span>
-                        </div>
-                        <h1 className="font-display text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">EcoAlert</h1>
-                        <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm font-medium">Join India's Green Network</p>
+            <div className="auth-card">
+                {/* Logo */}
+                <div className="auth-logo">
+                    <div className="auth-logo-icon">🌿</div>
+                    <div>
+                        <div className="auth-logo-name">EcoAlert</div>
+                        <div className="auth-logo-tag">{t('appTagline')}</div>
+                    </div>
+                </div>
+
+                {/* Language */}
+                <div className="auth-lang-row">
+                    <Globe size={14} style={{ color: 'var(--text-sub)' }} />
+                    <select
+                        className="auth-lang-select"
+                        value={lang}
+                        onChange={e => setLang(e.target.value)}
+                    >
+                        {LANGUAGES.map(l => (
+                            <option key={l.code} value={l.code}>
+                                {l.flag} {l.native}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <h1 className="auth-title">{t('signup')}</h1>
+                <p className="auth-demo-hint">✨ {t('demoHint')}</p>
+
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="auth-field">
+                        <User size={16} className="auth-field-icon" />
+                        <input
+                            className="auth-input"
+                            type="text"
+                            placeholder={t('enterName')}
+                            value={name}
+                            onChange={e => { setName(e.target.value); setErr(''); }}
+                            autoComplete="name"
+                        />
+                    </div>
+                    <div className="auth-field">
+                        <Phone size={16} className="auth-field-icon" />
+                        <input
+                            className="auth-input"
+                            type="tel"
+                            placeholder={t('enterPhone')}
+                            value={phone}
+                            onChange={e => { setPhone(e.target.value.replace(/\D/g, '')); setErr(''); }}
+                            maxLength={10}
+                            autoComplete="tel"
+                        />
                     </div>
 
-                    <form
-                        onSubmit={handleSignup}
-                        className="flex flex-col gap-5 rounded-xl p-6 bg-black/5 dark:bg-black/20 border border-black/5 dark:border-white/5"
-                    >
-                        <div className="text-center mb-2">
-                            <h2 className="font-display text-2xl font-semibold text-slate-900 dark:text-slate-100">Create Account</h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm">Start reporting environmental issues</p>
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Full Name</label>
-                            <div className="relative">
-                                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl">person</span>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={e => setName(e.target.value)}
-                                    placeholder="Enter your name"
-                                    required
-                                    className="w-full bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Phone Number</label>
-                            <div className="flex gap-2">
-                                <div className="relative w-24">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-sm font-bold">+91</span>
-                                    <select className="w-full bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl py-3.5 pl-10 pr-2 text-slate-900 dark:text-slate-100 appearance-none focus:ring-2 focus:ring-primary/50 outline-none">
-                                        <option>IN</option>
-                                    </select>
-                                </div>
-                                <div className="relative flex-1">
-                                    <input
-                                        type="tel"
-                                        value={phone}
-                                        onChange={e => setPhone(e.target.value)}
-                                        placeholder="00000-00000"
-                                        className="w-full bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl py-3.5 px-4 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Preferred Language</label>
-                            <div className="relative">
-                                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl">translate</span>
-                                <select
-                                    value={lang}
-                                    onChange={e => setLang(e.target.value)}
-                                    className="w-full bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl py-3.5 pl-12 pr-10 text-slate-900 dark:text-slate-100 appearance-none focus:ring-2 focus:ring-primary/50 outline-none"
-                                >
-                                    {LANGUAGES.map(l => (
-                                        <option key={l.code} value={l.code}>{l.label}</option>
-                                    ))}
-                                </select>
-                                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">expand_more</span>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-gradient-to-r from-primary to-[#12a146] hover:brightness-110 text-slate-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 mt-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                    {/* State selector */}
+                    <div className="auth-field">
+                        <span style={{ fontSize: '1rem', marginLeft: 2 }}>🗺️</span>
+                        <select
+                            className="auth-input"
+                            value={state}
+                            onChange={e => setState(e.target.value)}
+                            style={{ paddingLeft: 8 }}
                         >
-                            {loading ? 'Creating account…' : 'Sign Up'}
-                        </button>
+                            <option value="">Select your State (optional)</option>
+                            {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                    </div>
 
-                        <div className="text-center mt-2">
-                            <p className="text-sm text-slate-400">
-                                Already have an account?{' '}
-                                <Link to="/login" className="text-primary font-semibold hover:underline">Login</Link>
-                            </p>
-                        </div>
-                    </form>
-                </div>
+                    {err && <div className="auth-error">{err}</div>}
+
+                    <button
+                        type="submit"
+                        className="btn-primary btn-full"
+                        disabled={loading}
+                        style={{ marginTop: 4 }}
+                    >
+                        {loading
+                            ? <span className="spinning" style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
+                            : <><span>{t('continueBtn')}</span><ArrowRight size={16} /></>
+                        }
+                    </button>
+                </form>
+
+                <p className="auth-switch">
+                    {t('hasAccount')}{' '}
+                    <button className="auth-link" onClick={() => navigate('/login')}>
+                        {t('login')}
+                    </button>
+                </p>
             </div>
         </div>
     );

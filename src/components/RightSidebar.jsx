@@ -1,95 +1,105 @@
 import React from 'react';
+import { Search, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function RightSidebar() {
-    const { posts } = useApp();
+    const { posts, searchQuery, setSearchQuery } = useApp();
+    const navigate = useNavigate();
 
-    // Top categories by count
-    const categoryCounts = posts.reduce((acc, p) => {
-        acc[p.category] = (acc[p.category] || 0) + 1;
-        return acc;
-    }, {});
-    const topCategories = Object.entries(categoryCounts)
-        .sort((a, b) => b[1] - a[1])
+    const critical = posts.filter(p => p.risk?.level === 'Critical').slice(0, 3);
+    const trending = [...posts]
+        .sort((a, b) => b.likes - a.likes)
         .slice(0, 5);
 
-    // High-risk posts
-    const highRiskPosts = posts.filter((p) => p.risk?.level === 'High').slice(0, 3);
-
-    // Top cities
-    const cityCounts = posts.reduce((acc, p) => {
-        const city = p.location?.city;
-        if (city) acc[city] = (acc[city] || 0) + 1;
-        return acc;
-    }, {});
-    const topCities = Object.entries(cityCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
+    // Category counts
+    const categories = ['Air', 'Water', 'Land', 'Wildlife', 'Climate', 'Disaster'];
+    const catEmoji = { Air: '💨', Water: '💧', Land: '🌍', Wildlife: '🐾', Climate: '🌡️', Disaster: '🚨' };
+    const catCounts = categories.map(cat => ({
+        name: cat,
+        emoji: catEmoji[cat],
+        count: posts.filter(p => p.category === cat).length,
+    })).sort((a, b) => b.count - a.count);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* Trending Categories */}
-            <div className="glass-card" style={{ padding: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '15px', color: 'var(--green)' }}>trending_up</span>
-                    Trending Categories
-                </div>
-                {topCategories.length === 0 ? (
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>No data yet</p>
-                ) : (
-                    topCategories.map(([cat, count]) => (
-                        <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.35rem 0', borderBottom: '1px solid var(--glass-border)' }}>
-                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{cat}</span>
-                            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--green)', background: 'rgba(78,205,136,0.1)', borderRadius: '999px', padding: '0.1rem 0.5rem' }}>{count}</span>
-                        </div>
-                    ))
-                )}
+        <>
+            {/* Search bar */}
+            <div className="rs-search">
+                <Search size={16} />
+                <input
+                    placeholder="Search EcoAlert"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                />
             </div>
 
-            {/* High Risk Alerts */}
-            {highRiskPosts.length > 0 && (
-                <div className="glass-card" style={{ padding: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '15px', color: '#f87171' }}>warning</span>
-                        High Risk Alerts
+            {/* Critical Alerts Widget */}
+            {critical.length > 0 && (
+                <div className="rs-widget">
+                    <div className="rs-widget-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <AlertTriangle size={16} style={{ color: '#f4212e' }} />
+                        Critical Alerts
                     </div>
-                    {highRiskPosts.map((post) => (
-                        <div key={post.id} style={{ padding: '0.4rem 0', borderBottom: '1px solid var(--glass-border)' }}>
-                            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {post.caption?.slice(0, 55)}{(post.caption?.length || 0) > 55 ? '…' : ''}
-                            </div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                                📍 {post.location?.city}
+                    {critical.map(post => (
+                        <div className="alert-item" key={post.id} onClick={() => navigate('/')}>
+                            <div className="alert-dot" style={{ background: '#f4212e' }} />
+                            <div>
+                                <div style={{ fontSize: '0.85rem', fontWeight: 600, lineHeight: 1.35 }}>
+                                    {post.caption.slice(0, 60)}{post.caption.length > 60 ? '…' : ''}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)', marginTop: 2 }}>
+                                    📍 {post.location.city}
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* Active Cities */}
-            <div className="glass-card" style={{ padding: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '15px', color: 'var(--green)' }}>location_on</span>
-                    Active Cities
+            {/* Trending Widget */}
+            <div className="rs-widget">
+                <div className="rs-widget-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <TrendingUp size={16} style={{ color: 'var(--green)' }} />
+                    Trending in Environment
                 </div>
-                {topCities.length === 0 ? (
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>No data yet</p>
-                ) : (
-                    topCities.map(([city, count]) => (
-                        <div key={city} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.35rem 0', borderBottom: '1px solid var(--glass-border)' }}>
-                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{city}</span>
-                            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--green)', background: 'rgba(78,205,136,0.1)', borderRadius: '999px', padding: '0.1rem 0.5rem' }}>{count} alerts</span>
+                {catCounts.map((cat, i) => (
+                    <div className="trend-item" key={cat.name} onClick={() => navigate('/explore')}>
+                        <div className="trend-info">
+                            <div className="trend-category">Environment · Trending</div>
+                            <div className="trend-name">{cat.emoji} {cat.name} Issues</div>
+                            <div className="trend-count">{cat.count} report{cat.count !== 1 ? 's' : ''}</div>
                         </div>
-                    ))
-                )}
+                        <div className="trend-rank">···</div>
+                    </div>
+                ))}
+                <button className="rs-show-more" onClick={() => navigate('/explore')}>
+                    Show more
+                </button>
             </div>
 
-            {/* EcoAlert info */}
-            <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '22px', color: 'var(--green)', marginBottom: '0.5rem' }}>eco</span>
-                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.35rem' }}>EcoAlert India</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>Real-time environmental monitoring powered by AI. Report. Verify. Protect.</div>
+            {/* Top Posts Widget */}
+            <div className="rs-widget">
+                <div className="rs-widget-title">🔥 Most Liked</div>
+                {trending.slice(0, 3).map(post => (
+                    <div className="trend-item" key={post.id} onClick={() => navigate('/')}>
+                        <div className="trend-info">
+                            <div className="trend-category">📍 {post.location.city}</div>
+                            <div className="trend-name" style={{ fontSize: '0.85rem' }}>
+                                {post.caption.slice(0, 55)}{post.caption.length > 55 ? '…' : ''}
+                            </div>
+                            <div className="trend-count">❤️ {post.likes} likes</div>
+                        </div>
+                    </div>
+                ))}
             </div>
-        </div>
+
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-sub)', lineHeight: 1.6, padding: '0 4px' }}>
+                EcoAlert MVP · Environmental Awareness Platform
+                <br />
+                AI-powered risk detection · Location-based alerts
+                <br />
+                <span style={{ color: 'var(--green)' }}>🌿 Protecting the planet, one report at a time.</span>
+            </div>
+        </>
     );
 }
