@@ -73,7 +73,7 @@ export default function Navbar({ onCreatePost }) {
                 {/* ── LEFT: Brand ── */}
                 <div className="navbar-brand" onClick={() => navigate('/')} title="Home">
                     <div className="navbar-logo-icon">🌿</div>
-                    <span className="navbar-logo-text">EnviroX</span>
+                    <span className="navbar-logo-text">EcoAlert</span>
                 </div>
 
                 {/* ── CENTER: Search ── */}
