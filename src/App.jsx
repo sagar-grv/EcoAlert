@@ -20,6 +20,7 @@ const SignupPage = lazy(() => import('./pages/SignupPage'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const PostDetail = lazy(() => import('./pages/PostDetail'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // ── Per-route error boundary ──────────────────────────────
 class RouteErrorBoundary extends React.Component {
@@ -90,7 +91,7 @@ function AppShell() {
                     <Route path="/analysis" element={<SafeRoute><Analysis /></SafeRoute>} />
                     <Route path="/profile/:id" element={<SafeRoute><ProfilePage /></SafeRoute>} />
                     <Route path="/post/:postId" element={<SafeRoute><PostDetail /></SafeRoute>} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<SafeRoute><NotFoundPage /></SafeRoute>} />
                 </Routes>
             </div>
             <BottomNav onCreatePost={() => setShowCreate(true)} />

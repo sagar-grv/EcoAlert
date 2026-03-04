@@ -4,16 +4,22 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { mockPosts } from '../data/mockPosts';
+import { seedDemoComments } from '../data/demoComments';
 import { useAuth } from './AuthContext';
 import { FIREBASE_ENABLED } from '../firebase';
 import {
     subscribeToPosts,
     addPostToFirestore,
+    deletePostFromFirestore,
     toggleLikeInFirestore,
+    incrementShareInFirestore,
     uploadPostImage,
+    saveBookmarks,
+    loadBookmarks,
+    reportPost,
 } from '../services/firestoreService';
 import { analyzePost } from '../services/geminiService';
-import { generateId } from '../utils/helpers';
+import { generateId, sanitizeInput } from '../utils/helpers';
 
 const AppContext = createContext(null);
 
@@ -24,9 +30,9 @@ export function AppProvider({ children }) {
     const [posts, setPosts] = useState(() => {
         if (FIREBASE_ENABLED) return []; // Firestore will populate
         const version = localStorage.getItem('ecoalert_posts_version');
-        if (version !== '4') {
+        if (version !== '5') {
             localStorage.removeItem('ecoalert_posts');
-            localStorage.setItem('ecoalert_posts_version', '4');
+            localStorage.setItem('ecoalert_posts_version', '5');
             return mockPosts;
         }
         const saved = localStorage.getItem('ecoalert_posts');
@@ -43,13 +49,28 @@ export function AppProvider({ children }) {
         try { return JSON.parse(localStorage.getItem('ecoalert_bookmarks')) || []; } catch { return []; }
     });
 
+    // ── Seed demo comments on first run (demo mode) ──────────
+    useEffect(() => {
+        if (!FIREBASE_ENABLED) {
+            seedDemoComments();
+        }
+    }, []);
+
+    // ── Load bookmarks from Firestore on login ───────────────
+    useEffect(() => {
+        if (FIREBASE_ENABLED && user?.uid) {
+            loadBookmarks(user.uid).then((ids) => {
+                if (ids.length > 0) setBookmarks(ids);
+            });
+        }
+    }, [user?.uid]);
+
     // ── Firestore real-time listener ──────────────────────────
     useEffect(() => {
         if (!FIREBASE_ENABLED) return;
         setFeedLoading(true);
         let seeded = false;
         const unsub = subscribeToPosts((livePosts) => {
-            // If Firestore is empty, seed with mock posts on first load (once)
             if (livePosts.length === 0 && !seeded) {
                 seeded = true;
                 seedFirestoreWithMockPosts();
@@ -61,7 +82,6 @@ export function AppProvider({ children }) {
         return unsub;
     }, []);
 
-    // Seed Firestore with mock posts on first run
     async function seedFirestoreWithMockPosts() {
         for (const post of mockPosts) {
             await addPostToFirestore({ ...post, likedBy: [] });
@@ -86,18 +106,17 @@ export function AppProvider({ children }) {
         if (!user) return;
 
         const postId = generateId();
+        const cleanCaption = sanitizeInput(postData.caption);
 
-        // Run AI analysis
         let imageBase64 = null;
         if (imageFile) {
             imageBase64 = await fileToBase64(imageFile);
         }
-        const analysis = await analyzePost(postData.caption, imageBase64, postData.category);
+        const analysis = await analyzePost(cleanCaption, imageBase64, postData.category);
 
         let imageUrl = postData.image || null;
 
         if (FIREBASE_ENABLED) {
-            // Upload image first
             if (imageFile) {
                 try {
                     imageUrl = await uploadPostImage(imageFile, postId, null);
@@ -107,6 +126,7 @@ export function AppProvider({ children }) {
             }
             const doc = {
                 ...postData,
+                caption: cleanCaption,
                 author: user.name,
                 avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`,
                 userId: user.uid,
@@ -127,17 +147,16 @@ export function AppProvider({ children }) {
                 shares: 0,
                 hasImage: !!imageUrl,
             };
-            // Remove flat location keys before saving
             delete doc.locationCity;
             delete doc.locationState;
             delete doc.locationLat;
             delete doc.locationLng;
             await addPostToFirestore(doc);
         } else {
-            // Demo mode: add to local state
             const newPost = {
                 id: postId,
                 ...postData,
+                caption: cleanCaption,
                 author: user.name,
                 avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`,
                 userId: user.uid,
@@ -159,7 +178,6 @@ export function AppProvider({ children }) {
                 shares: 0,
                 hasImage: !!imageFile || !!postData.image,
             };
-            // Remove flat location keys
             delete newPost.locationCity;
             delete newPost.locationState;
             delete newPost.locationLat;
@@ -167,6 +185,38 @@ export function AppProvider({ children }) {
             setPosts((prev) => [newPost, ...prev]);
         }
         showToast('✅ Report posted successfully!');
+    }
+
+    // ── Delete post ──────────────────────────────────────────
+    async function deletePost(postId) {
+        if (!user) return;
+        try {
+            if (FIREBASE_ENABLED) {
+                await deletePostFromFirestore(postId);
+            } else {
+                setPosts((prev) => prev.filter((p) => p.id !== postId));
+                localStorage.removeItem(`ecoalert_comments_${postId}`);
+            }
+            showToast('🗑️ Post deleted');
+        } catch (err) {
+            showToast(err.message || 'Failed to delete post', 'error');
+        }
+    }
+
+    // ── Report post ──────────────────────────────────────────
+    async function reportPostHandler(postId, reason) {
+        try {
+            if (FIREBASE_ENABLED) {
+                await reportPost(postId, { reportedBy: user?.uid, reason });
+            } else {
+                const reports = JSON.parse(localStorage.getItem('ecoalert_reports') || '[]');
+                reports.push({ postId, reportedBy: user?.uid, reason, timestamp: new Date().toISOString() });
+                localStorage.setItem('ecoalert_reports', JSON.stringify(reports));
+            }
+            showToast('⚠️ Post reported. We will review it.');
+        } catch {
+            showToast('Failed to report post', 'error');
+        }
     }
 
     // ── Toggle like ───────────────────────────────────────────
@@ -180,7 +230,6 @@ export function AppProvider({ children }) {
 
         if (FIREBASE_ENABLED) {
             await toggleLikeInFirestore(postId, user.uid, isLiked);
-            // Firestore listener will update state automatically
         } else {
             setPosts((prev) =>
                 prev.map((p) =>
@@ -215,7 +264,10 @@ export function AppProvider({ children }) {
     }
 
     // ── Increment share count ─────────────────────────────────
-    function incrementShareCount(postId) {
+    async function incrementShareCount(postId) {
+        if (FIREBASE_ENABLED) {
+            await incrementShareInFirestore(postId);
+        }
         setPosts((prev) => {
             const newPosts = prev.map((p) =>
                 p.id === postId ? { ...p, shares: (p.shares || 0) + 1 } : p
@@ -230,6 +282,9 @@ export function AppProvider({ children }) {
         setBookmarks((prev) => {
             const next = prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId];
             localStorage.setItem('ecoalert_bookmarks', JSON.stringify(next));
+            if (FIREBASE_ENABLED && user?.uid) {
+                saveBookmarks(user.uid, next);
+            }
             return next;
         });
     }
@@ -257,11 +312,13 @@ export function AppProvider({ children }) {
             activeRisk, setActiveRisk,
             searchQuery, setSearchQuery,
             userLocation, setUserLocation,
-            addPost, toggleLike,
+            addPost, deletePost, reportPost: reportPostHandler,
+            toggleLike,
             getFilteredPosts,
             incrementCommentCount,
             incrementShareCount,
-            bookmarks, toggleBookmark, isBookmarked
+            bookmarks, toggleBookmark, isBookmarked,
+            isFirebase: FIREBASE_ENABLED,
         }}>
             {children}
         </AppContext.Provider>

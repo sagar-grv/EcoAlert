@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Loader } from 'lucide-react';
+import { Send, Loader, MessageCircle } from 'lucide-react';
 import { subscribeToComments, addCommentToFirestore } from '../services/firestoreService';
 import { useAuth } from '../context/AuthContext';
 import { formatTime } from '../utils/helpers';
 import { FIREBASE_ENABLED } from '../firebase';
 import { useApp } from '../context/AppContext';
+
+const MAX_COMMENT_LENGTH = 280;
 
 export default function CommentSection({ postId }) {
     const { user } = useAuth();
@@ -90,7 +92,10 @@ export default function CommentSection({ postId }) {
         <div className="comment-section">
             <div className="comments-list">
                 {comments.length === 0 ? (
-                    <div className="no-comments">No comments yet. Be the first to add one!</div>
+                    <div className="no-comments" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '1.5rem 0' }}>
+                        <MessageCircle size={24} style={{ opacity: 0.3 }} />
+                        <span>No comments yet. Be the first!</span>
+                    </div>
                 ) : (
                     comments.map(comment => (
                         <div key={comment.id} className="comment-item">
@@ -118,9 +123,15 @@ export default function CommentSection({ postId }) {
                         type="text"
                         placeholder="Add a comment..."
                         value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
+                        onChange={(e) => { if (e.target.value.length <= MAX_COMMENT_LENGTH) setNewComment(e.target.value); }}
                         disabled={submitting}
+                        maxLength={MAX_COMMENT_LENGTH}
                     />
+                    {newComment.length > 0 && (
+                        <span style={{ fontSize: '0.72rem', color: newComment.length > 250 ? 'var(--red)' : 'var(--text-sub)', minWidth: 28, textAlign: 'right' }}>
+                            {MAX_COMMENT_LENGTH - newComment.length}
+                        </span>
+                    )}
                     <button type="submit" disabled={!newComment.trim() || submitting} className="comment-submit-btn">
                         <Send size={16} />
                     </button>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Repeat2, Share2, Flag, MapPin, ImageOff, MessageCircle, Bookmark } from 'lucide-react';
+import { Heart, Repeat2, Share2, Flag, MapPin, ImageOff, MessageCircle, Bookmark, MoreHorizontal, Trash2, AlertTriangle } from 'lucide-react';
 import RiskBadge from './RiskBadge';
 import FakeNewsIndicator from './FakeNewsIndicator';
 import AISuggestionPanel from './AISuggestionPanel';
@@ -11,16 +11,41 @@ import { formatTime } from '../utils/helpers';
 
 const PostCard = React.memo(function PostCard({ post }) {
     const navigate = useNavigate();
-    const { toggleLike, setSearchQuery, incrementShareCount, toggleBookmark, isBookmarked } = useApp();
+    const { toggleLike, setSearchQuery, incrementShareCount, toggleBookmark, isBookmarked, deletePost, reportPost } = useApp();
     const { user } = useAuth();
     const isLiked = Array.isArray(post.likedBy)
         ? post.likedBy.includes(user?.uid)
         : post.liked;
+    const isOwnPost = user && (post.userId === user.uid || post.author === user.name);
     const [shared, setShared] = useState(false);
     const [retweeted, setRetweeted] = useState(false);
     const [retweetCount, setRetweetCount] = useState(post.shares || 0);
     const [flagged, setFlagged] = useState(false);
     const [showComments, setShowComments] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const menuRef = useRef(null);
+
+    // Close menu on outside click
+    useEffect(() => {
+        if (!showMenu) return;
+        const handler = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [showMenu]);
+
+    const handleDelete = async () => {
+        setShowDeleteConfirm(false);
+        setShowMenu(false);
+        await deletePost(post.id);
+    };
+
+    const handleReport = () => {
+        setShowMenu(false);
+        reportPost(post.id, 'Reported by user');
+    };
 
     const handleShare = () => {
         setShared(true);
@@ -77,13 +102,47 @@ const PostCard = React.memo(function PostCard({ post }) {
 
             {/* Main body */}
             <div className="post-body">
-                {/* Header row: name · handle · time */}
+                {/* Header row: name · handle · time · menu */}
                 <div className="post-header-row">
                     <span className="post-author" onClick={() => navigate('/profile/' + encodeURIComponent(post.author || 'User'))} style={{ cursor: 'pointer' }}>{post.author || 'User'}</span>
                     <span className="post-handle">{handle}</span>
                     <span className="post-dot">·</span>
                     <span className="post-time" onClick={() => navigate('/post/' + post.id)} style={{ cursor: 'pointer' }} title="View full post">{formatTime(post.timestamp)}</span>
+                    {/* ⋯ menu */}
+                    <div className="post-menu-wrap" ref={menuRef} style={{ marginLeft: 'auto' }}>
+                        <button className="action-btn post-menu-btn" onClick={() => setShowMenu((p) => !p)} title="More options">
+                            <MoreHorizontal size={16} />
+                        </button>
+                        {showMenu && (
+                            <div className="post-dropdown">
+                                {isOwnPost ? (
+                                    <button className="post-dropdown-item danger" onClick={() => { setShowMenu(false); setShowDeleteConfirm(true); }}>
+                                        <Trash2 size={14} /> Delete Post
+                                    </button>
+                                ) : (
+                                    <button className="post-dropdown-item" onClick={handleReport}>
+                                        <AlertTriangle size={14} /> Report Post
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+                {/* Delete confirmation modal */}
+                {showDeleteConfirm && (
+                    <div className="delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
+                        <div className="delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+                            <Trash2 size={24} style={{ color: '#ef4444' }} />
+                            <h4>Delete this post?</h4>
+                            <p>This action cannot be undone.</p>
+                            <div className="delete-confirm-actions">
+                                <button className="btn-cancel" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                                <button className="btn-delete" onClick={handleDelete}>Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Location */}
                 {post.location && (

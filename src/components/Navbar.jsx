@@ -8,7 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 import LanguagePicker from './LanguagePicker';
 
 export default function Navbar({ onCreatePost }) {
-    const { searchQuery, setSearchQuery, getFilteredPosts, posts } = useApp();
+    const { searchQuery, setSearchQuery, getFilteredPosts, posts, isFirebase } = useApp();
     const { user, logout } = useAuth();
     const { t } = useLang();
     const { theme, toggleTheme } = useTheme();
@@ -91,6 +91,7 @@ export default function Navbar({ onCreatePost }) {
                 <div className="navbar-brand" onClick={() => navigate('/')} title="Home">
                     <div className="navbar-logo-icon">🌿</div>
                     <span className="navbar-logo-text">EnviroX</span>
+                    {!isFirebase && <span className="demo-badge">Demo</span>}
                 </div>
 
                 {/* ── CENTER: Search ── */}

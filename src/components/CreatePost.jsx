@@ -1,47 +1,96 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, MapPin, Loader, CheckCircle, Sparkles, Image } from 'lucide-react';
+import { X, Upload, MapPin, Loader, CheckCircle, Sparkles, Image, Navigation } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { autoCategorizePost } from '../services/geminiService';
+import { compressImage, formatBytes } from '../utils/helpers';
 
 const CATEGORIES = ['Air', 'Water', 'Land', 'Wildlife', 'Climate', 'Disaster'];
 const CAT_EMOJI = { Air: '💨', Water: '💧', Land: '🌍', Wildlife: '🐾', Climate: '🌡️', Disaster: '🚨' };
 
-const INDIAN_CITIES = [
-    { city: 'Mumbai', state: 'Maharashtra', lat: 19.076, lng: 72.878 },
-    { city: 'Delhi', state: 'Delhi', lat: 28.614, lng: 77.209 },
-    { city: 'Bengaluru', state: 'Karnataka', lat: 12.972, lng: 77.595 },
-    { city: 'Chennai', state: 'Tamil Nadu', lat: 13.083, lng: 80.271 },
-    { city: 'Hyderabad', state: 'Telangana', lat: 17.385, lng: 78.487 },
-    { city: 'Kolkata', state: 'West Bengal', lat: 22.573, lng: 88.364 },
-    { city: 'Pune', state: 'Maharashtra', lat: 18.52, lng: 73.856 },
-    { city: 'Ahmedabad', state: 'Gujarat', lat: 23.022, lng: 72.571 },
-    { city: 'Jaipur', state: 'Rajasthan', lat: 26.912, lng: 75.788 },
-    { city: 'Lucknow', state: 'Uttar Pradesh', lat: 26.847, lng: 80.947 },
-    { city: 'Bhopal', state: 'Madhya Pradesh', lat: 23.259, lng: 77.413 },
-    { city: 'Patna', state: 'Bihar', lat: 25.594, lng: 85.138 },
-];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export default function CreatePost({ onClose }) {
     const { addPost, showToast } = useApp();
     const { user } = useAuth();
     const [caption, setCaption] = useState('');
     const [category, setCategory] = useState('Air');
-    const [selectedCity, setSelectedCity] = useState(INDIAN_CITIES[0]);
+    const [locationInfo, setLocationInfo] = useState({
+        city: 'Mumbai', state: 'Maharashtra', lat: 19.076, lng: 72.878,
+    });
     const [preview, setPreview] = useState(null);
     const [imageSrc, setImageSrc] = useState(null);
+    const [compressedFile, setCompressedFile] = useState(null);
+    const [fileInfo, setFileInfo] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [detectingLocation, setDetectingLocation] = useState(false);
     const [isCategorizing, setIsCategorizing] = useState(false);
     const [done, setDone] = useState(false);
     const fileRef = useRef();
 
-
-    const handleFile = e => {
+    // ── Handle image selection with compression ──────────────
+    const handleFile = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => { setPreview(ev.target.result); setImageSrc(ev.target.result); };
-        reader.readAsDataURL(file);
+
+        if (file.size > MAX_FILE_SIZE) {
+            showToast(`File too large (${formatBytes(file.size)}). Max 5 MB.`, 'error');
+            return;
+        }
+
+        try {
+            const result = await compressImage(file, 1200, 0.8);
+            setPreview(result.dataUrl);
+            setImageSrc(result.dataUrl);
+            setCompressedFile(new File([result.blob], file.name, { type: 'image/jpeg' }));
+            setFileInfo({
+                original: result.originalSize,
+                compressed: result.compressedSize,
+                saved: Math.round((1 - result.compressedSize / result.originalSize) * 100),
+            });
+        } catch {
+            // Fallback: use original file
+            const reader = new FileReader();
+            reader.onload = (ev) => { setPreview(ev.target.result); setImageSrc(ev.target.result); };
+            reader.readAsDataURL(file);
+            setCompressedFile(file);
+            setFileInfo({ original: file.size, compressed: file.size, saved: 0 });
+        }
+    };
+
+    // ── Detect location ──────────────────────────────────────
+    const handleDetectLocation = async () => {
+        if (!navigator.geolocation) {
+            showToast('Geolocation not supported in your browser', 'error');
+            return;
+        }
+        setDetectingLocation(true);
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                try {
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                    );
+                    const data = await res.json();
+                    setLocationInfo({
+                        city: data.address?.city || data.address?.town || data.address?.village || 'Detected',
+                        state: data.address?.state || '',
+                        lat: latitude,
+                        lng: longitude,
+                    });
+                    showToast(`📍 Location: ${data.address?.city || data.address?.town || 'Detected'}`);
+                } catch {
+                    setLocationInfo({ city: 'Detected', state: '', lat: latitude, lng: longitude });
+                }
+                setDetectingLocation(false);
+            },
+            () => {
+                showToast('Location access denied', 'error');
+                setDetectingLocation(false);
+            },
+            { timeout: 10000 }
+        );
     };
 
     const handleAutoCategorize = async () => {
@@ -62,25 +111,20 @@ export default function CreatePost({ onClose }) {
         }
     };
 
-    const handleSubmit = async e => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!caption.trim()) return;
         setLoading(true);
 
-        let fileObj = null;
-        if (fileRef.current && fileRef.current.files && fileRef.current.files.length > 0) {
-            fileObj = fileRef.current.files[0];
-        }
-
         await addPost({
             caption,
             category,
-            imageSrc, // we pass this but AppContext ignores it, instead uses imageFile
-            locationCity: selectedCity.city,
-            locationState: selectedCity.state,
-            locationLat: selectedCity.lat,
-            locationLng: selectedCity.lng,
-        }, fileObj);
+            imageSrc,
+            locationCity: locationInfo.city,
+            locationState: locationInfo.state,
+            locationLat: locationInfo.lat,
+            locationLng: locationInfo.lng,
+        }, compressedFile || (fileRef.current?.files?.[0] || null));
 
         setLoading(false);
         setDone(true);
@@ -121,6 +165,7 @@ export default function CreatePost({ onClose }) {
                                     placeholder="What environmental issue are you reporting?"
                                     value={caption}
                                     onChange={e => setCaption(e.target.value)}
+                                    maxLength={500}
                                     autoFocus
                                 />
 
@@ -130,23 +175,21 @@ export default function CreatePost({ onClose }) {
                                     marginBottom: 10, color: 'var(--green)', fontSize: '0.875rem', fontWeight: 600,
                                 }}>
                                     <MapPin size={14} />
-                                    <select
+                                    <span>{locationInfo.city}{locationInfo.state ? `, ${locationInfo.state}` : ''}</span>
+                                    <button
+                                        type="button"
+                                        onClick={handleDetectLocation}
+                                        disabled={detectingLocation}
                                         style={{
-                                            background: 'transparent', border: 'none', color: 'var(--green)',
-                                            font: 'inherit', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
-                                        }}
-                                        value={selectedCity.city}
-                                        onChange={e => {
-                                            const found = INDIAN_CITIES.find(c => c.city === e.target.value);
-                                            if (found) setSelectedCity(found);
+                                            background: 'none', border: 'none', cursor: 'pointer',
+                                            color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 4,
+                                            fontSize: '0.78rem', marginLeft: 8, padding: '2px 8px',
+                                            borderRadius: 999, border: '1px solid rgba(0,200,83,0.3)',
                                         }}
                                     >
-                                        {INDIAN_CITIES.map(c => (
-                                            <option key={c.city} value={c.city} style={{ background: '#1a1a1a', color: '#e7e9ea' }}>
-                                                {c.city}, {c.state}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        {detectingLocation ? <Loader size={12} className="spinning" /> : <Navigation size={12} />}
+                                        {detectingLocation ? 'Detecting...' : 'Detect'}
+                                    </button>
                                 </div>
 
                                 {/* Image preview */}
@@ -156,8 +199,17 @@ export default function CreatePost({ onClose }) {
                                         <button
                                             type="button"
                                             className="image-remove-btn"
-                                            onClick={() => { setPreview(null); setImageSrc(null); }}
+                                            onClick={() => { setPreview(null); setImageSrc(null); setCompressedFile(null); setFileInfo(null); }}
                                         >✕</button>
+                                        {fileInfo && fileInfo.saved > 0 && (
+                                            <div style={{
+                                                position: 'absolute', bottom: 8, left: 8, padding: '2px 8px',
+                                                background: 'rgba(0,0,0,0.7)', borderRadius: 6, fontSize: '0.7rem',
+                                                color: '#00c853',
+                                            }}>
+                                                {formatBytes(fileInfo.compressed)} (-{fileInfo.saved}%)
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -199,7 +251,7 @@ export default function CreatePost({ onClose }) {
                                 <button type="button" className="toolbar-icon" onClick={() => fileRef.current.click()} title="Add photo">
                                     <Image size={18} />
                                 </button>
-                                <button type="button" className="toolbar-icon" title="Add location">
+                                <button type="button" className="toolbar-icon" onClick={handleDetectLocation} title="Detect location" disabled={detectingLocation}>
                                     <MapPin size={18} />
                                 </button>
                                 <button
@@ -218,9 +270,9 @@ export default function CreatePost({ onClose }) {
                                 {caption.length > 0 && (
                                     <span style={{
                                         fontSize: '0.82rem',
-                                        color: caption.length > 260 ? 'var(--red)' : 'var(--text-sub)',
+                                        color: caption.length > 450 ? 'var(--red)' : 'var(--text-sub)',
                                     }}>
-                                        {280 - caption.length}
+                                        {500 - caption.length}
                                     </span>
                                 )}
                                 <button
