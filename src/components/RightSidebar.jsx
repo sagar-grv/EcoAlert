@@ -96,21 +96,38 @@ export default function RightSidebar() {
                     <Zap size={16} style={{ color: 'var(--amber)' }} fill="var(--amber)" />
                     Top Eco-Warriors
                 </div>
-                {[
-                    { name: 'Dr. Ishaan Bhat', points: 1420, badge: 'Veteran' },
-                    { name: 'Arjun Mehra', points: 1250, badge: 'Activist' },
-                    { name: 'Priyanka G.', points: 980, badge: 'Reporter' },
-                ].map((u, i) => (
-                    <div className="trend-item" key={u.name} style={{ cursor: 'pointer' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-card2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)' }}>
-                            {i + 1}
+                {(() => {
+                    // Compute leaderboard from actual post data
+                    const authorStats = {};
+                    posts.forEach(p => {
+                        const name = p.author || 'Anonymous';
+                        if (!authorStats[name]) authorStats[name] = { name, points: 0, posts: 0 };
+                        authorStats[name].points += (p.likes || 0) * 10 + (p.shares || 0) * 5 + 50; // 50 per post
+                        authorStats[name].posts += 1;
+                    });
+                    const topUsers = Object.values(authorStats)
+                        .sort((a, b) => b.points - a.points)
+                        .slice(0, 3)
+                        .map(u => ({
+                            ...u,
+                            badge: u.points >= 1000 ? 'Veteran' : u.points >= 500 ? 'Activist' : 'Reporter'
+                        }));
+                    return topUsers.length > 0 ? topUsers.map((u, i) => (
+                        <div className="trend-item" key={u.name} style={{ cursor: 'pointer' }}>
+                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-card2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)' }}>
+                                {i + 1}
+                            </div>
+                            <div className="trend-info" style={{ marginLeft: 10 }}>
+                                <div className="trend-name" style={{ fontSize: '0.82rem', fontWeight: 600 }}>{u.name}</div>
+                                <div className="trend-count">{u.points} Impact Points · {u.badge}</div>
+                            </div>
                         </div>
-                        <div className="trend-info" style={{ marginLeft: 10 }}>
-                            <div className="trend-name" style={{ fontSize: '0.82rem', fontWeight: 600 }}>{u.name}</div>
-                            <div className="trend-count">{u.points} Impact Points · {u.badge}</div>
+                    )) : (
+                        <div style={{ padding: '12px 16px', fontSize: '0.85rem', color: 'var(--text-sub)' }}>
+                            No activity yet.
                         </div>
-                    </div>
-                ))}
+                    );
+                })()}
             </div>
 
             {/* Top Posts Widget */}

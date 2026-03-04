@@ -8,7 +8,7 @@ import { useApp } from '../context/AppContext';
 
 export default function CommentSection({ postId }) {
     const { user } = useAuth();
-    const { toast, incrementCommentCount } = useApp();
+    const { incrementCommentCount } = useApp();
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(FIREBASE_ENABLED);

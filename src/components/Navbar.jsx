@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, PlusCircle, LogOut, User, ChevronDown, Bell, Mail, Home, Compass, BarChart3, MapPin } from 'lucide-react';
+import { Search, PlusCircle, LogOut, User, ChevronDown, Bell, Mail, Home, Compass, BarChart3, MapPin, Sun, Moon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LangContext';
+import { useTheme } from '../context/ThemeContext';
 import LanguagePicker from './LanguagePicker';
 
 export default function Navbar({ onCreatePost }) {
-    const { searchQuery, setSearchQuery, getFilteredPosts } = useApp();
+    const { searchQuery, setSearchQuery, getFilteredPosts, posts } = useApp();
     const { user, logout } = useAuth();
     const { t } = useLang();
+    const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [avatarOpen, setAvatarOpen] = useState(false);
@@ -43,28 +45,43 @@ export default function Navbar({ onCreatePost }) {
     }
 
     function handleSearch(e) {
-        if (e.key === 'Enter') {
-            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            // Navigate to home and let the filter handle search
+            navigate('/');
         }
     }
 
-    // Get notification count (mock implementation)
-    const notificationCount = 3;
-    const messageCount = 5;
+    // Helper function for time difference (assuming it exists or is defined elsewhere)
+    const formatTimeDiff = (timestamp) => {
+        const now = new Date();
+        const postDate = new Date(timestamp);
+        const diffSeconds = Math.floor((now - postDate) / 1000);
 
-    // Get sample notifications (mock implementation)
-    const notifications = [
-        { id: 1, type: 'like', user: 'EcoWarrior', content: 'liked your post', time: '2m ago' },
-        { id: 2, type: 'follow', user: 'GreenActivist', content: 'started following you', time: '1h ago' },
-        { id: 3, type: 'reply', user: 'ClimateExpert', content: 'replied to your post', time: '3h ago' },
-    ];
+        if (diffSeconds < 60) return `${diffSeconds}s ago`;
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        if (diffMinutes < 60) return `${diffMinutes}m ago`;
+        const diffHours = Math.floor(diffMinutes / 60);
+        if (diffHours < 24) return `${diffHours}h ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        return `${diffDays}d ago`;
+    };
 
-    // Get sample messages (mock implementation)
-    const messages = [
-        { id: 1, user: 'EcoWarrior', content: 'Thanks for sharing this!', time: '10m ago', unread: true },
-        { id: 2, user: 'GreenActivist', content: 'Can we collaborate?', time: '1h ago', unread: false },
-        { id: 3, user: 'ClimateExpert', content: 'Great initiative!', time: '2h ago', unread: false },
-    ];
+    // Dynamic notifications from real posts
+    const recentPosts = [...posts].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+    const notifications = recentPosts.map((p, i) => ({
+        id: p.id,
+        type: i === 0 ? 'alert' : i % 2 === 0 ? 'like' : 'reply',
+        user: p.author || 'Unknown',
+        content: p.risk?.level === 'Critical' ? `reported a Critical alert in ${p.location?.city || 'unknown area'}` : `posted about ${p.category || 'environment'} in ${p.location?.city || 'unknown area'}`,
+        time: formatTimeDiff(p.timestamp),
+    }));
+    const notificationCount = notifications.length;
+
+    const messages = recentPosts.slice(0, 3).map(p => ({
+        id: p.id, user: p.author || 'Unknown',
+        content: p.caption?.slice(0, 40) + (p.caption?.length > 40 ? '...' : ''),
+        time: formatTimeDiff(p.timestamp), unread: true
+    }));
 
     return (
         <nav className="navbar">
@@ -91,7 +108,16 @@ export default function Navbar({ onCreatePost }) {
                 {/* ── RIGHT: Actions ── */}
                 <div className="navbar-actions">
 
-                    {/* Notifications */}
+                    {/* Theme Toggle */}
+                    <button
+                        className="navbar-icon-btn"
+                        onClick={toggleTheme}
+                        title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        style={{ fontSize: 0 }}
+                    >
+                        {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
+                    </button>
+
                     <div className="navbar-notification-wrap" ref={notificationRef}>
                         <button
                             className="navbar-icon-btn"
@@ -138,8 +164,8 @@ export default function Navbar({ onCreatePost }) {
                             title="Messages"
                         >
                             <Mail size={20} />
-                            {messageCount > 0 && (
-                                <span className="notification-badge">{messageCount}</span>
+                            {messages.length > 0 && (
+                                <span className="notification-badge">{messages.length}</span>
                             )}
                         </button>
 
@@ -189,7 +215,7 @@ export default function Navbar({ onCreatePost }) {
                             >
                                 <img
                                     className="navbar-avatar"
-                                    src={user.avatar}
+                                    src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.uid || user.name || 'eco')}`}
                                     alt={user.username || user.name}
                                 />
                                 <ChevronDown size={13} className={`navbar-chevron ${avatarOpen ? 'open' : ''}`} />

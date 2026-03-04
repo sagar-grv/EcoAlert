@@ -15,7 +15,7 @@ export function LangProvider({ children }) {
         if (user?.lang && user.lang !== lang) {
             setLangState(user.lang);
         }
-    }, [user?.lang]);
+    }, [user?.lang, lang]);
 
     function setLang(code) {
         setLangState(code);

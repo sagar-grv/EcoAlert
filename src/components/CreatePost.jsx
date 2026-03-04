@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload, MapPin, Loader, CheckCircle, Sparkles, Image } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { autoCategorizePost } from '../services/geminiService';
 
 const CATEGORIES = ['Air', 'Water', 'Land', 'Wildlife', 'Climate', 'Disaster'];
@@ -23,6 +24,7 @@ const INDIAN_CITIES = [
 
 export default function CreatePost({ onClose }) {
     const { addPost, showToast } = useApp();
+    const { user } = useAuth();
     const [caption, setCaption] = useState('');
     const [category, setCategory] = useState('Air');
     const [selectedCity, setSelectedCity] = useState(INDIAN_CITIES[0]);
@@ -109,7 +111,7 @@ export default function CreatePost({ onClose }) {
                         <div className="modal-composer">
                             <img
                                 className="modal-avatar"
-                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=EcoUser42"
+                                src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.uid || user?.name || 'eco')}`}
                                 alt="You"
                             />
                             <div className="modal-inputs">

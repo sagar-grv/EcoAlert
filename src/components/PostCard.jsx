@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Repeat2, Share2, Flag, MapPin, ImageOff, MessageCircle } from 'lucide-react';
+import { Heart, Repeat2, Share2, Flag, MapPin, ImageOff, MessageCircle, Bookmark } from 'lucide-react';
 import RiskBadge from './RiskBadge';
 import FakeNewsIndicator from './FakeNewsIndicator';
 import AISuggestionPanel from './AISuggestionPanel';
 import CommentSection from './CommentSection';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { formatTime } from '../utils/helpers';
 
-export default function PostCard({ post }) {
+const PostCard = React.memo(function PostCard({ post }) {
     const navigate = useNavigate();
-    const { toggleLike, setSearchQuery } = useApp();
+    const { toggleLike, setSearchQuery, incrementShareCount, toggleBookmark, isBookmarked } = useApp();
+    const { user } = useAuth();
+    const isLiked = Array.isArray(post.likedBy)
+        ? post.likedBy.includes(user?.uid)
+        : post.liked;
     const [shared, setShared] = useState(false);
     const [retweeted, setRetweeted] = useState(false);
     const [retweetCount, setRetweetCount] = useState(post.shares || 0);
@@ -19,6 +24,7 @@ export default function PostCard({ post }) {
 
     const handleShare = () => {
         setShared(true);
+        incrementShareCount(post.id);
         setTimeout(() => setShared(false), 2000);
         if (navigator.clipboard) {
             navigator.clipboard.writeText(`EcoAlert: ${post.caption} — ${post.location?.city || 'Unknown'}`);
@@ -76,7 +82,7 @@ export default function PostCard({ post }) {
                     <span className="post-author" onClick={() => navigate('/profile/' + encodeURIComponent(post.author || 'User'))} style={{ cursor: 'pointer' }}>{post.author || 'User'}</span>
                     <span className="post-handle">{handle}</span>
                     <span className="post-dot">·</span>
-                    <span className="post-time">{formatTime(post.timestamp)}</span>
+                    <span className="post-time" onClick={() => navigate('/post/' + post.id)} style={{ cursor: 'pointer' }} title="View full post">{formatTime(post.timestamp)}</span>
                 </div>
 
                 {/* Location */}
@@ -189,11 +195,11 @@ export default function PostCard({ post }) {
 
                     {/* Like */}
                     <button
-                        className={`action-btn like-btn ${post.liked ? 'liked' : ''}`}
+                        className={`action-btn like-btn ${isLiked ? 'liked' : ''}`}
                         onClick={() => toggleLike(post.id)}
-                        title={post.liked ? 'Unlike' : 'Like'}
+                        title={isLiked ? 'Unlike' : 'Like'}
                     >
-                        <Heart size={17} fill={post.liked ? 'currentColor' : 'none'} />
+                        <Heart size={17} fill={isLiked ? 'currentColor' : 'none'} />
                         <span>{post.likes}</span>
                     </button>
 
@@ -215,6 +221,18 @@ export default function PostCard({ post }) {
                     >
                         <Flag size={15} fill={flagged ? 'currentColor' : 'none'} />
                     </button>
+
+                    {/* Bookmark */}
+                    <button
+                        className={`action-btn bookmark-btn`}
+                        onClick={() => toggleBookmark(post.id)}
+                        title={isBookmarked(post.id) ? 'Remove bookmark' : 'Save post'}
+                        style={{
+                            color: isBookmarked(post.id) ? 'var(--green-400)' : undefined,
+                        }}
+                    >
+                        <Bookmark size={15} fill={isBookmarked(post.id) ? 'currentColor' : 'none'} />
+                    </button>
                 </div>
 
                 {/* Comment Section */}
@@ -224,9 +242,11 @@ export default function PostCard({ post }) {
             </div>
         </article>
     );
-}
+});
 
 function getCategoryEmoji(cat) {
     const map = { Air: '💨', Water: '💧', Land: '🌍', Wildlife: '🐾', Climate: '🌡️', Disaster: '🚨' };
     return map[cat] || '🌿';
 }
+
+export default PostCard;

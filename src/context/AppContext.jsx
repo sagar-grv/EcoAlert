@@ -38,14 +38,20 @@ export function AppProvider({ children }) {
     const [activeRisk, setActiveRisk] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [toast, setToast] = useState(null);
+    const [userLocation, setUserLocation] = useState(null);
+    const [bookmarks, setBookmarks] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('ecoalert_bookmarks')) || []; } catch { return []; }
+    });
 
     // ── Firestore real-time listener ──────────────────────────
     useEffect(() => {
         if (!FIREBASE_ENABLED) return;
         setFeedLoading(true);
+        let seeded = false;
         const unsub = subscribeToPosts((livePosts) => {
-            // If Firestore is empty, seed with mock posts on first load
-            if (livePosts.length === 0) {
+            // If Firestore is empty, seed with mock posts on first load (once)
+            if (livePosts.length === 0 && !seeded) {
+                seeded = true;
                 seedFirestoreWithMockPosts();
             } else {
                 setPosts(livePosts);
@@ -105,6 +111,12 @@ export function AppProvider({ children }) {
                 avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`,
                 userId: user.uid,
                 image: imageUrl,
+                location: {
+                    city: postData.locationCity || postData.location?.city || 'Unknown',
+                    state: postData.locationState || postData.location?.state || '',
+                    lat: postData.locationLat || postData.location?.lat || null,
+                    lng: postData.locationLng || postData.location?.lng || null,
+                },
                 fakeNews: analysis.fakeNews,
                 risk: analysis.risk,
                 suggestions: analysis.suggestions,
@@ -115,6 +127,11 @@ export function AppProvider({ children }) {
                 shares: 0,
                 hasImage: !!imageUrl,
             };
+            // Remove flat location keys before saving
+            delete doc.locationCity;
+            delete doc.locationState;
+            delete doc.locationLat;
+            delete doc.locationLng;
             await addPostToFirestore(doc);
         } else {
             // Demo mode: add to local state
@@ -125,6 +142,12 @@ export function AppProvider({ children }) {
                 avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`,
                 userId: user.uid,
                 image: imageBase64 || null,
+                location: {
+                    city: postData.locationCity || postData.location?.city || 'Unknown',
+                    state: postData.locationState || postData.location?.state || '',
+                    lat: postData.locationLat || postData.location?.lat || null,
+                    lng: postData.locationLng || postData.location?.lng || null,
+                },
                 fakeNews: analysis.fakeNews,
                 risk: analysis.risk,
                 suggestions: analysis.suggestions,
@@ -136,6 +159,11 @@ export function AppProvider({ children }) {
                 shares: 0,
                 hasImage: !!imageFile || !!postData.image,
             };
+            // Remove flat location keys
+            delete newPost.locationCity;
+            delete newPost.locationState;
+            delete newPost.locationLat;
+            delete newPost.locationLng;
             setPosts((prev) => [newPost, ...prev]);
         }
         showToast('✅ Report posted successfully!');
@@ -180,11 +208,32 @@ export function AppProvider({ children }) {
                         ? { ...p, commentCount: (p.commentCount || 0) + 1 }
                         : p
                 );
-                localStorage.setItem('localPosts', JSON.stringify(newPosts));
+                localStorage.setItem('ecoalert_posts', JSON.stringify(newPosts));
                 return newPosts;
             });
         }
     }
+
+    // ── Increment share count ─────────────────────────────────
+    function incrementShareCount(postId) {
+        setPosts((prev) => {
+            const newPosts = prev.map((p) =>
+                p.id === postId ? { ...p, shares: (p.shares || 0) + 1 } : p
+            );
+            if (!FIREBASE_ENABLED) localStorage.setItem('ecoalert_posts', JSON.stringify(newPosts));
+            return newPosts;
+        });
+    }
+
+    // ── Bookmarks ─────────────────────────────────────────────
+    function toggleBookmark(postId) {
+        setBookmarks((prev) => {
+            const next = prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId];
+            localStorage.setItem('ecoalert_bookmarks', JSON.stringify(next));
+            return next;
+        });
+    }
+    function isBookmarked(postId) { return bookmarks.includes(postId); }
 
     // ── Filtered posts ────────────────────────────────────────
     const getFilteredPosts = useCallback(() => {
@@ -207,9 +256,12 @@ export function AppProvider({ children }) {
             activeCategory, setActiveCategory,
             activeRisk, setActiveRisk,
             searchQuery, setSearchQuery,
+            userLocation, setUserLocation,
             addPost, toggleLike,
             getFilteredPosts,
-            incrementCommentCount
+            incrementCommentCount,
+            incrementShareCount,
+            bookmarks, toggleBookmark, isBookmarked
         }}>
             {children}
         </AppContext.Provider>
